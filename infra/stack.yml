@@ -1,0 +1,14 @@
+version: '3.0'
+
+services:
+  db:
+    image: postgres:9.6
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: dev
+
+  adminer:
+    image: adminer
+    restart: always
+    ports: 
+      - 8081:8080
