@@ -8,19 +8,19 @@ import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
-import com.speedcentral.configuration.{MetadataRouter, SearchRouter}
+import com.speedcentral.configuration.{CorsSupport, MetadataRouter, SearchRouter}
 import com.speedcentral.controllers.SearchController
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
-object Server {
+object Server extends CorsSupport {
 
   def main(args: Array[String]): Unit = {
     implicit val system: ActorSystem = ActorSystem()
     implicit val materializer: ActorMaterializer = ActorMaterializer()
     implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 
-    val bindingFuture = Http().bindAndHandle(buildRoutes(), "localhost", 8080)
+    val bindingFuture = Http().bindAndHandle(corsHandler(buildRoutes()), "localhost", 8080)
 
     system.registerOnTermination({
       println("Terminating!")
