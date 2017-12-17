@@ -13,7 +13,9 @@ import com.speedcentral.controllers.SearchController
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
-object Server extends CorsSupport {
+object Server
+  extends CorsSupport
+  with RequestLogger {
 
   def main(args: Array[String]): Unit = {
     implicit val system: ActorSystem = ActorSystem()
@@ -37,7 +39,7 @@ object Server extends CorsSupport {
       searchController, executionContexts.searchExecutionContext
     ).buildRoutes()
 
-    metadataRoutes ~ searchRoutes
+    logResponseTime(metadataRoutes ~ searchRoutes)
   }
 
   private def buildExecutionContexts(): ControllerExecutionContexts = {
