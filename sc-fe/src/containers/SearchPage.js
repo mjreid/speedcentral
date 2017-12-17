@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import SearchResults from '../components/SearchResults';
-import { search } from '../actions';
+import {searchRequest} from "../modules/search";
 
+// Component
 class SearchPage extends Component {
 
   static propTypes = {
@@ -41,16 +42,17 @@ class SearchPage extends Component {
 }
 
 function mapStateToProps(state) {
+  console.log(state);
   return {
-    query: state.searchResults.query,
-    paging: state.searchResults.paging,
-    results: state.searchResults.results,
+    query: state.searchReducer.query,
+    paging: state.searchReducer.paging,
+    results: state.searchReducer.results,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return({
-    searchRequest: (query) => dispatch(search.request(query))
+    searchRequest: (query) => dispatch(searchRequest(query))
   })
 }
 
