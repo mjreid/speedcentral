@@ -14,7 +14,7 @@ export default class SearchResults extends Component {
 
   static renderItem(item) {
     return (
-      <div>{item.name} - {item.id}</div>
+      <div key={item.id}>{item.name} - {item.id}</div>
     )
   }
 }

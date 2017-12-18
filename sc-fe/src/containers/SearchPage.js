@@ -42,7 +42,6 @@ class SearchPage extends Component {
 }
 
 function mapStateToProps(state) {
-  console.log(state);
   return {
     query: state.searchReducer.query,
     paging: state.searchReducer.paging,
@@ -53,7 +52,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return({
     searchRequest: (query) => dispatch(searchRequest(query))
-  })
+  });
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchPage);

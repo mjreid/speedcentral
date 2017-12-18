@@ -6,7 +6,6 @@ import './index.css';
 import registerServiceWorker from './registerServiceWorker';
 import configureStore from './store/configureStore';
 import bootstrapSaga from './sagas';
-import routes from './routes';
 import Root from "./containers/Root";
 import { history } from './services';
 
@@ -16,8 +15,7 @@ store.runSaga(bootstrapSaga);
 ReactDOM.render(
   <Root
     store={store}
-    history={history}
-    routes={routes} />,
+    history={history} />,
   document.getElementById('root')
 );
 registerServiceWorker();
