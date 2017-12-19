@@ -1,15 +1,13 @@
-import PropTypes from "prop-types";
 import React, {Component} from "react";
 import {Grid, Row, Col} from 'react-bootstrap';
-import {connect} from "react-redux";
 import {LinkContainer} from "react-router-bootstrap";
 import Button from "react-bootstrap/es/Button";
+import App from "../App";
+import SearchPage from "./SearchPage";
+import {Route} from "react-router-dom";
+import {News} from "./News";
 
-class Layout extends Component {
-
-  static propTypes = {
-    mainContent: PropTypes.func.isRequired
-  };
+export class Layout extends Component {
 
   render() {
     return (
@@ -43,7 +41,9 @@ class Layout extends Component {
           </Col>
           <Col xs={10}>
             <div>
-              {this.props.mainContent()}
+              <Route exact path="/" component={App} key="1" />
+              <Route path="/news" component={News} key="2" />
+              <Route path="/search" component={SearchPage} key="3" />
             </div>
           </Col>
         </Row>
@@ -51,13 +51,3 @@ class Layout extends Component {
     );
   }
 }
-
-function mapStateToProps() {
-  return {};
-}
-
-function mapDispatchToProps() {
-  return {};
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Layout);

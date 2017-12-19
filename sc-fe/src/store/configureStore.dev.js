@@ -1,11 +1,12 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import { createLogger } from 'redux-logger';
+import { routerMiddleware } from 'react-router-redux';
 import { END } from 'redux-saga';
 import createSagaMiddleware from 'redux-saga';
 import DevTools from '../containers/DevTools';
 import rootReducer from '../reducers';
 
-export default function configureStore(initialState) {
+/*export default function configureStore(initialState) {
   const sagaMiddleware = createSagaMiddleware();
 
   const store = createStore(
@@ -13,6 +14,7 @@ export default function configureStore(initialState) {
     initialState,
     compose(
       applyMiddleware(
+        routerMiddleware(history),
         sagaMiddleware,
         createLogger()
       ),
@@ -30,4 +32,4 @@ export default function configureStore(initialState) {
   store.runSaga = sagaMiddleware.run;
   store.close = () => store.dispatch(END);
   return store;
-}
+}*/

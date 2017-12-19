@@ -9,7 +9,7 @@ import bootstrapSaga from './sagas';
 import Root from "./containers/Root";
 import { history } from './services';
 
-const store = configureStore();
+const store = configureStore({}, history);
 store.runSaga(bootstrapSaga);
 
 ReactDOM.render(
