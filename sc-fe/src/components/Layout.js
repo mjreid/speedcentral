@@ -2,10 +2,6 @@ import React, {Component} from "react";
 import {Grid, Row, Col} from 'react-bootstrap';
 import {LinkContainer} from "react-router-bootstrap";
 import Button from "react-bootstrap/es/Button";
-import App from "../App";
-import SearchPage from "./SearchPage";
-import {Route} from "react-router-dom";
-import {News} from "./News";
 
 export class Layout extends Component {
 
@@ -41,9 +37,7 @@ export class Layout extends Component {
           </Col>
           <Col xs={10}>
             <div>
-              <Route exact path="/" component={App} key="1" />
-              <Route path="/news" component={News} key="2" />
-              <Route path="/search" component={SearchPage} key="3" />
+              {this.props.children}
             </div>
           </Col>
         </Row>
