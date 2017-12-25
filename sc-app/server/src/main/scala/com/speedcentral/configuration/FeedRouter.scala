@@ -1,32 +1,30 @@
 package com.speedcentral.configuration
 
+import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import akka.http.scaladsl.server.Directives.{complete, get, onSuccess, parameters, pathPrefix}
 import akka.http.scaladsl.server.Route
-import com.speedcentral.controllers.SearchController
+import com.speedcentral.controllers.FeedController
 import com.speedcentral.api.JsonFormatters._
 
 import scala.concurrent.ExecutionContext
 
-
-class SearchRouter(
-  searchController: SearchController,
+class FeedRouter(
+  feedController: FeedController,
   executionContext: ExecutionContext
 ) extends ScRouteDefinition with SprayJsonSupport {
 
   implicit private val ec: ExecutionContext = executionContext
 
   override def buildRoutes(): Route = {
-    pathPrefix("search") {
+    path("feed") {
       get {
-        parameters('q) { query =>
-          onSuccess(searchController.search(query)) { result =>
-            complete {
-              result
-            }
+        onSuccess(feedController.defaultNewsFeed()) { result =>
+          complete {
+            result
           }
         }
       }
     }
   }
+
 }

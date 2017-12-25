@@ -5,6 +5,7 @@
   "dependencies": {
     "history": "^4.7.2",
     "humps": "^2.0.1",
+    "moment": "^2.20.1",
     "normalizr": "^3.2.4",
     "prop-types": "^15.6.0",
     "react": "^16.2.0",

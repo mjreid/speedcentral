@@ -3,6 +3,12 @@ export const api = {
     return fetch(`http://localhost:8080/search?q=${query}`)
       .then(response => response.json())
       .then(json => json.results.map(child => tempGen(child)));
+  },
+
+  feed: function() {
+    return fetch(`http://localhost:8080/feed`)
+      .then(response => response.json())
+      .then(json => json.results);
   }
 };
 

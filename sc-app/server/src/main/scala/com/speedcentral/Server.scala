@@ -8,8 +8,8 @@ import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
-import com.speedcentral.configuration.{CorsSupport, MetadataRouter, SearchRouter}
-import com.speedcentral.controllers.SearchController
+import com.speedcentral.configuration.{CorsSupport, FeedRouter, MetadataRouter, SearchRouter}
+import com.speedcentral.controllers.{FeedController, SearchController}
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
@@ -22,7 +22,7 @@ object Server
     implicit val materializer: ActorMaterializer = ActorMaterializer()
     implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 
-    val bindingFuture = Http().bindAndHandle(corsHandler(buildRoutes()), "localhost", 8080)
+    val bindingFuture = Http().bindAndHandle(buildRoutes(), "localhost", 8080)
 
     system.registerOnTermination({
       println("Terminating!")
@@ -36,10 +36,14 @@ object Server
     val metadataRoutes = new MetadataRouter().buildRoutes()
     val searchController = new SearchController()
     val searchRoutes = new SearchRouter(
-      searchController, executionContexts.searchExecutionContext
+      searchController, executionContexts.slowExecutionContext
+    ).buildRoutes()
+    val feedController = new FeedController()
+    val feedRoutes = new FeedRouter(
+      feedController, executionContexts.slowExecutionContext
     ).buildRoutes()
 
-    logResponseTime(metadataRoutes ~ searchRoutes)
+    corsHandler(logResponseTime(metadataRoutes ~ searchRoutes ~ feedRoutes))
   }
 
   private def buildExecutionContexts(): ControllerExecutionContexts = {
@@ -51,6 +55,6 @@ object Server
 }
 
 case class ControllerExecutionContexts(
-  primaryExecutionContext: ExecutionContext,
-  searchExecutionContext: ExecutionContext
+  fastExecutionContext: ExecutionContext,
+  slowExecutionContext: ExecutionContext
 )

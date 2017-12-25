@@ -1,0 +1,41 @@
+package com.speedcentral.controllers
+
+import com.speedcentral.api.FeedItem
+import spray.json.{JsObject, JsString}
+
+import scala.concurrent.{ExecutionContext, Future}
+
+class FeedController {
+  def defaultNewsFeed()(implicit ec: ExecutionContext): Future[List[FeedItem]] = {
+    Future {
+      List(
+        FeedItem(
+          itemType = "message",
+          id = "1",
+          date = "2017-12-14T00:29:40.276Z",
+          data = JsObject("header" -> JsString("hello"), "content" -> JsString("Welcome"))
+        ),
+        FeedItem(
+          itemType = "speedrun",
+          id = "2",
+          date = "2017-12-17T12:20:40.276Z",
+          data = JsObject(
+            "runner" -> JsString("Leeroy"),
+            "game" -> JsString("Super Mario Odyssey"),
+            "runTime" -> JsString("PT10M12.345S")
+          )
+        ),
+        FeedItem(
+          itemType = "highlight",
+          id = "3",
+          date = "2017-12-20T12:20:40.276Z",
+          data = JsObject(
+            "runner" -> JsString("Charlie Murphy"),
+            "game" -> JsString("Bubsy 3D"),
+            "videoUrl" -> JsString("https://www.youtube.com/watch?v=cll8NYl088U")
+          )
+        )
+      )
+    }
+  }
+}
