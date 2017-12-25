@@ -14,7 +14,7 @@ export default class FeedEntryMessage extends Component {
   };
 
   render() {
-    const { dateString } = this.props.date;
+    const dateString = this.props.date;
     const { header, content } = this.props.data;
 
     const displayDate = moment(dateString).fromNow();

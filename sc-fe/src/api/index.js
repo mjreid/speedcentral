@@ -7,8 +7,7 @@ export const api = {
 
   feed: function() {
     return fetch(`http://localhost:8080/feed`)
-      .then(response => response.json())
-      .then(json => json.results);
+      .then(response => response.json());
   }
 };
 

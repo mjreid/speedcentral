@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import FeedLoading from "../../components/feed/FeedLoading";
 import FeedEntryMessage from "../../components/feed/FeedEntryMessage";
 import {feedRequest} from "../../modules/feed";
+import FeedEntrySpeedrun from "../../components/feed/FeedEntrySpeedrun";
 
 const FEED_MESSAGE = "message";
 const FEED_SPEEDRUN = "speedrun";
@@ -36,7 +37,7 @@ class FeedWrapper extends Component {
             if (feedEntry.itemType === FEED_MESSAGE) {
               return (<FeedEntryMessage id={feedEntry.id} date={feedEntry.date} data={feedEntry.data} />);
             } else if (feedEntry.itemType === FEED_SPEEDRUN) {
-              return (<div />);
+              return (<FeedEntrySpeedrun id={feedEntry.id} date={feedEntry.date} data={feedEntry.data} />);
             } else if (feedEntry.itemType === FEED_HIGHLIGHT) {
               return (<div />);
             } else {
@@ -52,7 +53,7 @@ class FeedWrapper extends Component {
 
 function mapStateToProps(state) {
   return {
-    feedEntries: state.feed.query,
+    feedEntries: state.feed.feedEntries,
   };
 }
 
