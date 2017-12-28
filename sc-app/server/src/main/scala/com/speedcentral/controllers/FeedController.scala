@@ -25,16 +25,6 @@ class FeedController {
               "game" -> JsString("Super Mario Odyssey"),
               "runTime" -> JsString("PT10M12.345S")
             )
-          ),
-          FeedItem(
-            itemType = "highlight",
-            id = "3",
-            date = "2017-12-20T12:20:40.276Z",
-            data = JsObject(
-              "runner" -> JsString("Charlie Murphy"),
-              "game" -> JsString("Bubsy 3D"),
-              "videoUrl" -> JsString("https://www.youtube.com/watch?v=cll8NYl088U")
-            )
           )
         )
       )

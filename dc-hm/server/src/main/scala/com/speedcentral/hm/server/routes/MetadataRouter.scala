@@ -1,4 +1,4 @@
-package com.speedcentral.configuration
+package com.speedcentral.hm.server.routes
 
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.Directives._

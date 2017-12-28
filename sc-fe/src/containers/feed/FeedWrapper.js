@@ -38,8 +38,6 @@ class FeedWrapper extends Component {
               return (<FeedEntryMessage id={feedEntry.id} date={feedEntry.date} data={feedEntry.data} />);
             } else if (feedEntry.itemType === FEED_SPEEDRUN) {
               return (<FeedEntrySpeedrun id={feedEntry.id} date={feedEntry.date} data={feedEntry.data} />);
-            } else if (feedEntry.itemType === FEED_HIGHLIGHT) {
-              return (<div />);
             } else {
               console.debug("Unknown feed item type " + feedEntry.itemType);
               return (<div />);

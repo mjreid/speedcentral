@@ -1,4 +1,4 @@
-package com.speedcentral
+package com.speedcentral.hm.server
 
 import akka.event.{Logging, LoggingAdapter}
 import akka.http.scaladsl.model.{HttpRequest, Uri}
