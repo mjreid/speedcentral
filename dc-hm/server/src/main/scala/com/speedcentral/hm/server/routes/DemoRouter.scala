@@ -12,18 +12,21 @@ import scala.concurrent.ExecutionContext
 
 class DemoRouter(
   demoController: DemoController,
-  executionContext: ExecutionContext
+  executionContext: ExecutionContext,
+  apiKeyRestrictor: ApiKeyRestrictor
 ) extends ScRouteDefinition with SprayJsonSupport {
 
   implicit private val ec: ExecutionContext = executionContext
 
   override def buildRoutes(): Route = {
     path("demorecording") {
-      post {
-        entity(as[DemoRequest]) { demoRequest =>
-          onSuccess(demoController.startDemoRequest(demoRequest)) { result =>
-            complete {
-              result
+      apiKeyRestrictor.keyed {
+        post {
+          entity(as[DemoRequest]) { demoRequest =>
+            onSuccess(demoController.startDemoRequest(demoRequest)) { result =>
+              complete {
+                result
+              }
             }
           }
         }

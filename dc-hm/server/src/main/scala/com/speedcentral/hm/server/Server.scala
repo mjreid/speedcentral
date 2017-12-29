@@ -10,7 +10,7 @@ import akka.stream.ActorMaterializer
 import com.speedcentral.hm.server.config.{HmConfig, YouTubeConfig}
 import com.speedcentral.hm.server.controller.DemoController
 import com.speedcentral.hm.server.core._
-import com.speedcentral.hm.server.routes.{DemoRouter, MetadataRouter}
+import com.speedcentral.hm.server.routes.{ApiKeyRestrictor, DemoRouter, MetadataRouter}
 import com.speedcentral.hm.server.youtube.YouTubeAuth
 import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
@@ -43,7 +43,7 @@ object Server
 
     val demoManager = system.actorOf(DemoManager.props(databaseManager, recordingManager, uploadManager))
 
-    val bindingFuture = Http().bindAndHandle(buildRoutes(demoManager, uploadManager), "localhost", 10666)
+    val bindingFuture = Http().bindAndHandle(buildRoutes(demoManager, uploadManager, hmConfig), "localhost", 10666)
 
     system.registerOnTermination({
       println("Terminating!")
@@ -71,12 +71,14 @@ object Server
     }
   }
 
-  private def buildRoutes(demoManager: ActorRef, uploadManager: ActorRef): Route = {
+  private def buildRoutes(demoManager: ActorRef, uploadManager: ActorRef, hmConfig: HmConfig): Route = {
     val primaryExecutionContext = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(4))
 
     val demoController = new DemoController(demoManager)
-    val demoRouter = new DemoRouter(demoController, primaryExecutionContext)
-    val metadataRouter = new MetadataRouter(uploadManager, primaryExecutionContext)
+    val apiKeyRestrictor = new ApiKeyRestrictor(hmConfig.masterApiKey)
+
+    val demoRouter = new DemoRouter(demoController, primaryExecutionContext, apiKeyRestrictor)
+    val metadataRouter = new MetadataRouter(uploadManager, primaryExecutionContext, apiKeyRestrictor)
 
     logResponseTime(demoRouter.buildRoutes() ~ metadataRouter.buildRoutes())
   }

@@ -13,7 +13,8 @@ import scala.concurrent.duration._
 
 class MetadataRouter(
   uploadManager: ActorRef,
-  executionContext: ExecutionContext
+  executionContext: ExecutionContext,
+  apiKeyRestrictor: ApiKeyRestrictor
 ) extends ScRouteDefinition {
 
   implicit val ec: ExecutionContext = executionContext
@@ -31,14 +32,16 @@ class MetadataRouter(
       }
     } ~
     path("status") {
-      get {
-        onSuccess((uploadManager ? CheckConnection).mapTo[String]) { result =>
-          complete(
-            HttpEntity(
-              ContentTypes.`application/json`,
-              s"""{"result":"$result"}"""
+      apiKeyRestrictor.keyed {
+        get {
+          onSuccess((uploadManager ? CheckConnection).mapTo[String]) { result =>
+            complete(
+              HttpEntity(
+                ContentTypes.`application/json`,
+                s"""{"result":"$result"}"""
+              )
             )
-          )
+          }
         }
       }
     }
