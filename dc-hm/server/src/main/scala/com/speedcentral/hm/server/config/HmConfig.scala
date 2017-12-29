@@ -1,6 +1,6 @@
 package com.speedcentral.hm.server.config
 
-import java.io.File
+import java.nio.file.{Files, Path, Paths}
 
 import com.typesafe.config.Config
 import org.slf4j.{Logger, LoggerFactory}
@@ -9,12 +9,12 @@ import scala.util.Try
 
 case class HmConfig(
   masterApiKey: String,
-  prboomPlusExe: File,
-  iwadDirectory: File,
-  pwadDirectory: File
-) {
-
-}
+  prboomPlusExe: Path,
+  iwadDirectory: Path,
+  pwadDirectory: Path,
+  lmpDirectory: Path,
+  vidDirectory: Path
+)
 
 class HmConfigException(message: String) extends RuntimeException(message)
 
@@ -31,46 +31,72 @@ object HmConfig {
       val prboomPlusExe = config.getString("dc-hm.prboom-plus-exe")
       val iwadDirectory = config.getString("dc-hm.iwad-directory")
       val pwadDirectory = config.getString("dc-hm.pwad-directory")
+      val lmpDirectory = config.getString("dc-hm.lmp-directory")
+      val vidDirectory = config.getString("dc-hm.vid-directory")
 
-      val prboomPlusExeFile = new File(prboomPlusExe)
+      val prboomPlusExeFile = Paths.get(prboomPlusExe)
       // validate the executable
-      if (!prboomPlusExeFile.exists()) {
+      if (!Files.exists(prboomPlusExeFile)) {
         throw new HmConfigException(s"${prboomPlusExe} did not exist")
-      } else if (!prboomPlusExeFile.isFile) {
+      } else if (!Files.isRegularFile(prboomPlusExeFile)) {
         throw new HmConfigException(s"${prboomPlusExe} was not a file")
-      } else if (!prboomPlusExeFile.canExecute) {
+      } else if (!Files.isExecutable(prboomPlusExeFile)) {
         throw new HmConfigException(s"${prboomPlusExe} cannot be executed")
       }
 
       // validate iwads
-      val iwadDirectoryFile = new File(iwadDirectory)
-      if (!iwadDirectoryFile.exists()) {
+      val iwadDirectoryFile = Paths.get(iwadDirectory)
+      if (!Files.exists(iwadDirectoryFile)) {
         throw new HmConfigException(s"${iwadDirectory} did not exist")
-      } else if (!iwadDirectoryFile.canRead) {
+      } else if (!Files.isReadable(iwadDirectoryFile)) {
         throw new HmConfigException(s"${iwadDirectory} can't be read")
-      } else if (!iwadDirectoryFile.isDirectory) {
+      } else if (!Files.isDirectory(iwadDirectoryFile)) {
         throw new HmConfigException(s"${iwadDirectory} was not a directory")
       }
 
-      if (!new File(iwadDirectoryFile, Doom2).exists()) {
+      if (!Files.exists(iwadDirectoryFile.resolve(Doom2))) {
         logger.warn(s"$Doom2 was not found in $iwadDirectory")
       }
-      if (!new File(iwadDirectoryFile, Doom).exists()) {
+      if (!Files.exists(iwadDirectoryFile.resolve(Doom))) {
         logger.warn(s"$Doom was not found in $iwadDirectory")
       }
 
       // validate pwads
-      val pwadDirectoryFile = new File(pwadDirectory)
-      if (!pwadDirectoryFile.exists()) {
+      val pwadDirectoryFile = Paths.get(pwadDirectory)
+      if (!Files.exists(pwadDirectoryFile)) {
         throw new HmConfigException(s"${pwadDirectory} did not exist")
-      } else if (!pwadDirectoryFile.canRead) {
+      } else if (!Files.isReadable(pwadDirectoryFile)) {
         throw new HmConfigException(s"${pwadDirectory} can't be read")
-      } else if (!pwadDirectoryFile.isDirectory) {
+      } else if (!Files.isDirectory(pwadDirectoryFile)) {
         throw new HmConfigException(s"${pwadDirectory} was not a directory")
       }
 
-      HmConfig(masterApiKey, prboomPlusExeFile, iwadDirectoryFile, pwadDirectoryFile)
+      // validate lmp directory
+      val lmpDirectoryFile = Paths.get(lmpDirectory)
+      if (!Files.exists(lmpDirectoryFile)) {
+        throw new HmConfigException(s"${lmpDirectory} did not exist")
+      } else if (!Files.isReadable(lmpDirectoryFile)) {
+        throw new HmConfigException(s"${lmpDirectory} cannot be read")
+      } else if (!Files.isDirectory(lmpDirectoryFile)) {
+        throw new HmConfigException(s"${lmpDirectory} was not a directory")
+      } else if (!Files.isWritable(lmpDirectoryFile)) {
+        throw new HmConfigException(s"${lmpDirectory} was not writable")
+      }
 
+
+      // validate video directory
+      val vidDirectoryFile = Paths.get(vidDirectory)
+      if (!Files.exists(vidDirectoryFile)) {
+        throw new HmConfigException(s"${vidDirectory} did not exist")
+      } else if (!Files.isReadable(vidDirectoryFile)) {
+        throw new HmConfigException(s"${vidDirectory} cannot be read")
+      } else if (!Files.isDirectory(vidDirectoryFile)) {
+        throw new HmConfigException(s"${vidDirectory} was not a directory")
+      } else if (!Files.isWritable(vidDirectoryFile)) {
+        throw new HmConfigException(s"${vidDirectory} was not writable")
+      }
+
+      HmConfig(masterApiKey, prboomPlusExeFile, iwadDirectoryFile, pwadDirectoryFile, lmpDirectoryFile, vidDirectoryFile)
     }
   }
 }
