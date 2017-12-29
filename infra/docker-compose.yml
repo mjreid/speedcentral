@@ -5,7 +5,12 @@ services:
     image: postgres:9.6
     restart: always
     environment:
+      POSTGRES_USER: "speedcentral"
       POSTGRES_PASSWORD: dev
+    volumes:
+      - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql:ro
+    ports:
+      - 5432:5432
 
   adminer:
     image: adminer

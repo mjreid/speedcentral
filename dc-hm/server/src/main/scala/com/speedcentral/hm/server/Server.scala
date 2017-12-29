@@ -10,6 +10,7 @@ import akka.stream.ActorMaterializer
 import com.speedcentral.hm.server.config.{HmConfig, YouTubeConfig}
 import com.speedcentral.hm.server.controller.DemoController
 import com.speedcentral.hm.server.core._
+import com.speedcentral.hm.server.db.Repository
 import com.speedcentral.hm.server.routes.{ApiKeyRestrictor, DemoRouter, MetadataRouter}
 import com.speedcentral.hm.server.youtube.YouTubeAuth
 import com.typesafe.config.ConfigFactory
@@ -30,8 +31,10 @@ object Server
 
     val hmConfig = loadConfig()
     val recordingExecutionContext = ExecutionContext.fromExecutorService(Executors.newSingleThreadExecutor())
+    val dbExecutionContext = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(2))
     val recorder = new Recorder(hmConfig)
-    val databaseManager = system.actorOf(DatabaseManager.props())
+    val repository = new Repository(dbExecutionContext)
+    val databaseManager = system.actorOf(DatabaseManager.props(repository))
     val recordingManager = system.actorOf(RecordingManager.props(recordingExecutionContext, recorder))
 
 
@@ -43,7 +46,7 @@ object Server
 
     val demoManager = system.actorOf(DemoManager.props(databaseManager, recordingManager, uploadManager))
 
-    val bindingFuture = Http().bindAndHandle(buildRoutes(demoManager, uploadManager, hmConfig), "localhost", 10666)
+    val bindingFuture = Http().bindAndHandle(buildRoutes(demoManager, uploadManager, databaseManager, hmConfig), "localhost", 10666)
 
     system.registerOnTermination({
       println("Terminating!")
@@ -71,10 +74,10 @@ object Server
     }
   }
 
-  private def buildRoutes(demoManager: ActorRef, uploadManager: ActorRef, hmConfig: HmConfig): Route = {
+  private def buildRoutes(demoManager: ActorRef, uploadManager: ActorRef, databaseManager: ActorRef, hmConfig: HmConfig): Route = {
     val primaryExecutionContext = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(4))
 
-    val demoController = new DemoController(demoManager)
+    val demoController = new DemoController(demoManager, databaseManager)
     val apiKeyRestrictor = new ApiKeyRestrictor(hmConfig.masterApiKey)
 
     val demoRouter = new DemoRouter(demoController, primaryExecutionContext, apiKeyRestrictor)

@@ -16,19 +16,19 @@ class DemoManager(
   import DemoManager._
 
   override def receive: Receive = {
-    case StartDemo(demoRequest) =>
-      log.info(s"Received demo request for ${demoRequest.demoMetadata.runId}")
-      val lmpDataBytes = Base64.getDecoder.decode(demoRequest.lmpData)
-      recordingManager ! BeginRecording(demoRequest.demoMetadata.runId, lmpDataBytes)
+    case StartDemo(recordingId, lmpData) =>
+      log.info(s"Received demo request for $recordingId")
+      val lmpDataBytes = Base64.getDecoder.decode(lmpData)
+      recordingManager ! BeginRecording(recordingId, lmpDataBytes)
 
     case RecordingComplete(recordingResult) =>
       recordingResult match {
-        case RecordingFailure(runId, _, _) =>
+        case RecordingFailure(recordingId, _, _) =>
           // Do something here eventually
-          log.error(s"Recording failure for $runId")
-        case RecordingSuccess(runId, _, _, outputVideo) =>
-          log.info(s"Recording succeeded for $runId")
-          uploadManager ! UploadVideo(runId, outputVideo)
+          log.error(s"Recording failure for $recordingId")
+        case RecordingSuccess(recordingId, _, _, outputVideo) =>
+          log.info(s"Recording succeeded for $recordingId")
+          uploadManager ! UploadVideo(recordingId, outputVideo)
       }
 
     case UploadStarted(info) =>
@@ -43,7 +43,7 @@ object DemoManager {
   def props(databaseManager: ActorRef, recordingManager: ActorRef, uploadManager: ActorRef): Props =
     Props(new DemoManager(databaseManager, recordingManager, uploadManager))
 
-  case class StartDemo(demoRequest: DemoRequest)
+  case class StartDemo(recordingId: String, lmpData: String)
 
   case class RecordingComplete(recordingResult: RecordingResult)
 

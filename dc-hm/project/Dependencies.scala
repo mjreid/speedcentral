@@ -10,6 +10,8 @@ object Dependencies {
   private val typesafeConfigVersion = "1.3.1"
   private val youTubeApiVersion = "v3-rev189-1.23.0"
   private val googleJettyReceiverVersion = "1.23.0"
+  private val scalikeJdbcVersion = "3.1.0"
+  private val postgresDriverVersion = "42.1.4"
 
   val slf4j: ModuleID = "org.slf4j" % "slf4j-api" % slf4jVersion
   val akkaSlf4j: ModuleID = "com.typesafe.akka" %% "akka-slf4j" % akkaVersion
@@ -17,6 +19,9 @@ object Dependencies {
   val typesafeConfig: ModuleID = "com.typesafe" % "config" % typesafeConfigVersion
   val youTubeApi: ModuleID = "com.google.apis" % "google-api-services-youtube" % youTubeApiVersion
   val googleJetty: ModuleID = "com.google.oauth-client" % "google-oauth-client-jetty" % googleJettyReceiverVersion
+  val scalikeJdbc: ModuleID = "org.scalikejdbc" %% "scalikejdbc" % scalikeJdbcVersion
+  val scalikeJdbcConfig: ModuleID = "org.scalikejdbc" %% "scalikejdbc-config" % scalikeJdbcVersion
+  val postgresDriver: ModuleID = "org.postgresql" % "postgresql" % postgresDriverVersion
 
   val akkaHttp: ModuleID = "com.typesafe.akka" %% "akka-http" % akkaHttpVersion
   val sprayJson: ModuleID = "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion
@@ -26,7 +31,8 @@ object Dependencies {
 
   val all = Seq(
     slf4j, akkaHttp, sprayJson, scalaTest, scalaMock, logback,
-    akkaSlf4j, typesafeConfig, youTubeApi, googleJetty
+    akkaSlf4j, typesafeConfig, youTubeApi, googleJetty, scalikeJdbc,
+    scalikeJdbcConfig, postgresDriver
   )
 
   // API-only dependencies; should be lightweight
