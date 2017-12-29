@@ -1,10 +1,24 @@
 package com.speedcentral.hm.server.routes
 
+import akka.actor.ActorRef
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
+import akka.pattern.ask
+import akka.util.Timeout
+import com.speedcentral.hm.server.core.UploadManager.CheckConnection
 
-class MetadataRouter extends ScRouteDefinition {
+import scala.concurrent.ExecutionContext
+import scala.concurrent.duration._
+
+class MetadataRouter(
+  uploadManager: ActorRef,
+  executionContext: ExecutionContext
+) extends ScRouteDefinition {
+
+  implicit val ec: ExecutionContext = executionContext
+  implicit val timeout: Timeout = Timeout(10.seconds)
+
   override def buildRoutes(): Route = {
     path("version") {
       get {
@@ -14,6 +28,18 @@ class MetadataRouter extends ScRouteDefinition {
             """{"version":"0.0.1"}"""
           )
         )
+      }
+    } ~
+    path("status") {
+      get {
+        onSuccess((uploadManager ? CheckConnection).mapTo[String]) { result =>
+          complete(
+            HttpEntity(
+              ContentTypes.`application/json`,
+              s"""{"result":"$result"}"""
+            )
+          )
+        }
       }
     }
   }

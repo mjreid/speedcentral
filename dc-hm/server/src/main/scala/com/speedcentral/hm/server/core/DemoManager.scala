@@ -27,6 +27,8 @@ object DemoManager {
   case class StartDemo(demoRequest: DemoRequest)
 
   case class RecordingComplete(recordingResult: RecordingResult)
+
+  case class UploadComplete(uploadResult: Any)
 }
 
 

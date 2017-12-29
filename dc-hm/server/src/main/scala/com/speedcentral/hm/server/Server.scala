@@ -9,8 +9,9 @@ import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import com.speedcentral.hm.server.config.HmConfig
 import com.speedcentral.hm.server.controller.DemoController
-import com.speedcentral.hm.server.core.{DatabaseManager, DemoManager, Recorder, RecordingManager}
+import com.speedcentral.hm.server.core._
 import com.speedcentral.hm.server.routes.{DemoRouter, MetadataRouter}
+import com.speedcentral.hm.server.youtube.Auth
 import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
 
@@ -33,8 +34,10 @@ object Server
     val databaseManager = system.actorOf(DatabaseManager.props())
     val recordingManager = system.actorOf(RecordingManager.props(recordingExecutionContext, recorder))
     val demoManager = system.actorOf(DemoManager.props(databaseManager, recordingManager))
+    val auth = new Auth(hmConfig.youTubeConfig)
+    val uploadManager = system.actorOf(UploadManager.props(auth))
 
-    val bindingFuture = Http().bindAndHandle(buildRoutes(demoManager), "localhost", 10666)
+    val bindingFuture = Http().bindAndHandle(buildRoutes(demoManager, uploadManager), "localhost", 10666)
 
     system.registerOnTermination({
       println("Terminating!")
@@ -52,12 +55,12 @@ object Server
     }
   }
 
-  private def buildRoutes(demoManager: ActorRef): Route = {
+  private def buildRoutes(demoManager: ActorRef, uploadManager: ActorRef): Route = {
     val primaryExecutionContext = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(4))
 
     val demoController = new DemoController(demoManager)
     val demoRouter = new DemoRouter(demoController, primaryExecutionContext)
-    val metadataRouter = new MetadataRouter
+    val metadataRouter = new MetadataRouter(uploadManager, primaryExecutionContext)
 
     logResponseTime(demoRouter.buildRoutes() ~ metadataRouter.buildRoutes())
   }
