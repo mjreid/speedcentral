@@ -30,12 +30,17 @@ object Server
 
     val hmConfig = loadConfig()
     val recordingExecutionContext = ExecutionContext.fromExecutorService(Executors.newSingleThreadExecutor())
+    val uploadExecutionContext = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(4))
     val recorder = new Recorder(hmConfig)
     val databaseManager = system.actorOf(DatabaseManager.props())
     val recordingManager = system.actorOf(RecordingManager.props(recordingExecutionContext, recorder))
-    val demoManager = system.actorOf(DemoManager.props(databaseManager, recordingManager))
     val auth = new Auth(hmConfig.youTubeConfig)
-    val uploadManager = system.actorOf(UploadManager.props(auth))
+    val uploadManager = system.actorOf(UploadManager.props(auth, uploadExecutionContext))
+
+
+    val demoManager = system.actorOf(DemoManager.props(databaseManager, recordingManager, uploadManager))
+
+
 
     val bindingFuture = Http().bindAndHandle(buildRoutes(demoManager, uploadManager), "localhost", 10666)
 
