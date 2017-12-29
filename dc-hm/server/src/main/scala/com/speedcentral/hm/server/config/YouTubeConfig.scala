@@ -8,7 +8,8 @@ import com.typesafe.config.Config
 case class YouTubeConfig(
   credentialsFile: Path,
   credentialsDirectory: Path,
-  receiverPort: Int
+  receiverPort: Int,
+  enabled: Boolean
 )
 
 object YouTubeConfig {
@@ -17,6 +18,7 @@ object YouTubeConfig {
     val credentialsFile = config.getString("dc-hm.youtube.credentials-file")
     val credentialsDirectory = config.getString("dc-hm.youtube.credentials-directory")
     val receiverPort = config.getInt("dc-hm.youtube.receiver-port")
+    val enabled = config.getBoolean("dc-hm.youtube.enabled")
 
     val credentialsDirectoryPath = Paths.get(credentialsDirectory)
     PathUtil.validateDirectory(credentialsDirectory, credentialsDirectoryPath, checkWritable = true)
@@ -24,6 +26,6 @@ object YouTubeConfig {
     val credentialsFilePath = Paths.get(credentialsFile)
     PathUtil.validateFile(credentialsFile, credentialsFilePath)
 
-    YouTubeConfig(credentialsFilePath, credentialsDirectoryPath, receiverPort)
+    YouTubeConfig(credentialsFilePath, credentialsDirectoryPath, receiverPort, enabled)
   }
 }

@@ -7,11 +7,11 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
-import com.speedcentral.hm.server.config.HmConfig
+import com.speedcentral.hm.server.config.{HmConfig, YouTubeConfig}
 import com.speedcentral.hm.server.controller.DemoController
 import com.speedcentral.hm.server.core._
 import com.speedcentral.hm.server.routes.{DemoRouter, MetadataRouter}
-import com.speedcentral.hm.server.youtube.Auth
+import com.speedcentral.hm.server.youtube.YouTubeAuth
 import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
 
@@ -30,17 +30,18 @@ object Server
 
     val hmConfig = loadConfig()
     val recordingExecutionContext = ExecutionContext.fromExecutorService(Executors.newSingleThreadExecutor())
-    val uploadExecutionContext = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(4))
     val recorder = new Recorder(hmConfig)
     val databaseManager = system.actorOf(DatabaseManager.props())
     val recordingManager = system.actorOf(RecordingManager.props(recordingExecutionContext, recorder))
-    val auth = new Auth(hmConfig.youTubeConfig)
-    val uploadManager = system.actorOf(UploadManager.props(auth, uploadExecutionContext))
+
+
+    val youTubeAuth = new YouTubeAuth(hmConfig.youTubeConfig)
+    val youTubeWrapper = buildYouTubeWrapper(hmConfig.youTubeConfig, youTubeAuth)
+    val uploadExecutionContext = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(4))
+    val uploadManager = system.actorOf(UploadManager.props(youTubeWrapper, uploadExecutionContext))
 
 
     val demoManager = system.actorOf(DemoManager.props(databaseManager, recordingManager, uploadManager))
-
-
 
     val bindingFuture = Http().bindAndHandle(buildRoutes(demoManager, uploadManager), "localhost", 10666)
 
@@ -48,6 +49,16 @@ object Server
       println("Terminating!")
       bindingFuture.flatMap(_.unbind())
     })
+  }
+
+  private def buildYouTubeWrapper(youTubeConfig: YouTubeConfig, youTubeAuth: YouTubeAuth): YouTubeWrapper = {
+    if (youTubeConfig.enabled) {
+      logger.info("YouTube ENABLED.")
+      new YouTubeWrapperImpl(youTubeConfig, youTubeAuth)
+    } else {
+      logger.info("YouTube DISABLED, using stub implementation.")
+      new YouTubeWrapperStub
+    }
   }
 
   private def loadConfig(): HmConfig = {

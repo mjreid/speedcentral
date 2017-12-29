@@ -31,11 +31,8 @@ class RecordingManager(
 }
 
 object RecordingManager {
-
   def props(recordingExecutionContext: ExecutionContext, recorder: Recorder): Props =
     Props(new RecordingManager(recordingExecutionContext, recorder))
 
   case class BeginRecording(runId: String, lmp: Array[Byte])
-
-
 }

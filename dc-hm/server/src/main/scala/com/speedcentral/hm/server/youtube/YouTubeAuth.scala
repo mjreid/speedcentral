@@ -13,7 +13,7 @@ import com.speedcentral.hm.server.config.YouTubeConfig
 
 import scala.collection.JavaConverters._
 
-class Auth(
+class YouTubeAuth(
   youTubeConfig: YouTubeConfig
 ) {
   private val dataStoreName = "ytcreds"
