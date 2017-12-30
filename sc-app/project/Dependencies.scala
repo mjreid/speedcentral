@@ -7,6 +7,8 @@ object Dependencies {
   private val logbackVersion = "1.2.3"
   private val scalaTestVersion = "3.0.4"
   private val scalaMockVersion = "3.6.0"
+  private val scalikeJdbcVersion = "3.1.0"
+  private val postgresDriverVersion = "42.1.4"
 
   val slf4j: ModuleID = "org.slf4j" % "slf4j-api" % slf4jVersion
   val akkaSlf4j: ModuleID = "com.typesafe.akka" %% "akka-slf4j" % akkaVersion
@@ -16,9 +18,12 @@ object Dependencies {
   val sprayJson: ModuleID = "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion
   val scalaTest: ModuleID = "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
   val scalaMock: ModuleID = "org.scalamock" %% "scalamock-scalatest-support" % scalaMockVersion % "test"
+  val scalikeJdbc: ModuleID = "org.scalikejdbc" %% "scalikejdbc" % scalikeJdbcVersion
+  val scalikeJdbcConfig: ModuleID = "org.scalikejdbc" %% "scalikejdbc-config" % scalikeJdbcVersion
+  val postgresDriver: ModuleID = "org.postgresql" % "postgresql" % postgresDriverVersion
 
-
-  val all = Seq(slf4j, akkaHttp, sprayJson, scalaTest, scalaMock, logback, akkaSlf4j)
+  val all = Seq(slf4j, akkaHttp, sprayJson, scalaTest, scalaMock, logback,
+    akkaSlf4j, scalikeJdbc, scalikeJdbcConfig, postgresDriver)
 
   // API-only dependencies; should be lightweight
   val api = Seq(sprayJson, scalaTest)

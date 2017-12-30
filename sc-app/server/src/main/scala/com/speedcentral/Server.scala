@@ -17,6 +17,9 @@ object Server
   with RequestLogger {
 
   def main(args: Array[String]): Unit = {
+    // Set time zone to UTC so Instant.now() doesn't resolve to PDT or something weird.
+    java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"))
+
     implicit val system: ActorSystem = ActorSystem()
     implicit val materializer: ActorMaterializer = ActorMaterializer()
     implicit val executionContext: ExecutionContextExecutor = system.dispatcher
