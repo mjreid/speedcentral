@@ -15,16 +15,17 @@ class RecordingManager(
   import context.dispatcher
 
   override def receive: Receive = {
-    case BeginRecording(runId, lmp) =>
+    case BeginRecording(recordingId, lmp) =>
       val requestor = sender()
       // Run the beginRecording call on the separate EC.
       Future {
-        recorder.beginRecording(runId, lmp)
+        recorder.beginRecording(recordingId, lmp)
       }(recordingExecutionContext).onComplete {
         case Success(recordingResult) =>
           requestor ! RecordingComplete(recordingResult)
         case Failure(e) =>
           log.error(e, "Error recording demo")
+          requestor ! RecordingComplete(RecordingFailure(recordingId, "stdout", "stderr"))
       }
 
   }

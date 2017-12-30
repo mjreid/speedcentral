@@ -9,6 +9,7 @@ services:
       POSTGRES_PASSWORD: dev
     volumes:
       - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql:ro
+      - ./local_data.sql:/docker-entrypoint-initdb.d/local_data.sql:ro
     ports:
       - 5432:5432
 

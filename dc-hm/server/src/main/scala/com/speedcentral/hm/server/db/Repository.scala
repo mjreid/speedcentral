@@ -1,7 +1,9 @@
 package com.speedcentral.hm.server.db
 
-import scalikejdbc.config.DBs
+import java.time.Instant
+
 import scalikejdbc._
+import scalikejdbc.config.DBs
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -15,12 +17,33 @@ class Repository(
   def createRecording(runId: Long): Future[Recording] = {
     Future {
       DB localTx { implicit session =>
-        val insertedId = sql"""insert into recording (run_id) values (${runId}) RETURNING id""".updateAndReturnGeneratedKey().apply()
+        val createdDate = Instant.now()
+        val insertedId =
+          sql"""insert into recording (run_id, created_date)
+               values (${runId}, ${createdDate}) RETURNING id""".updateAndReturnGeneratedKey().apply()
         val r = Recording.syntax("r")
         val maybeRecording = sql"""select ${r.result.*} from ${Recording.as(r)} where ${r.id} = ${insertedId}"""
           .map(Recording(r.resultName)).single().apply()
 
         maybeRecording.getOrElse(throw HmDbException(s"Could not find recording with id $insertedId"))
+      }
+    }
+  }
+
+  def createRecordingHistory(recordingId: Long, state: String): Future[Unit] = {
+    Future {
+      DB localTx { implicit session =>
+        val currentTime = Instant.now()
+        sql"""insert into recording_history (recording_id, state, history_time)
+             values (${recordingId}, ${state}, ${currentTime})""".update().apply()
+      }
+    }
+  }
+
+  def addVideoToRecording(recordingId: Long, videoId: String): Future[Unit] = {
+    Future {
+      DB localTx { implicit session =>
+        sql"""update recording set video_id = ${videoId} where id = ${recordingId}""".update().apply()
       }
     }
   }

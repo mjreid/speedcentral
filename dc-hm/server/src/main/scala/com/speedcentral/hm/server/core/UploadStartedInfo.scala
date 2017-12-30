@@ -1,6 +1,6 @@
 package com.speedcentral.hm.server.core
 
 case class UploadStartedInfo(
-  runId: String,
+  recordingId: String,
   videoId: String
 )

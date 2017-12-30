@@ -10,7 +10,7 @@ import com.google.api.client.http.InputStreamContent
 import com.google.api.services.youtube.YouTube
 import com.google.api.services.youtube.model.{Video, VideoSnippet, VideoStatus}
 import com.speedcentral.hm.server.config.YouTubeConfig
-import com.speedcentral.hm.server.core.DemoManager.UploadCompleted
+import com.speedcentral.hm.server.core.DemoManager.UploadSucceeded
 import com.speedcentral.hm.server.youtube.YouTubeAuth
 import org.slf4j.LoggerFactory
 
@@ -35,8 +35,8 @@ class YouTubeWrapperImpl(
     log.info(s"YouTube request result: ${response.toPrettyString}")
   }
 
-  def uploadYouTubeVideo(runId: String, videoToUpload: Path, notifyActor: ActorRef): UploadStartedInfo = {
-    log.info(s"Building YouTube metadata for $runId")
+  def uploadYouTubeVideo(recordingId: String, videoToUpload: Path, notifyActor: ActorRef): UploadStartedInfo = {
+    log.info(s"Building YouTube metadata for $recordingId")
     val metadata = new Video()
     val videoStatus = new VideoStatus()
     videoStatus.setPrivacyStatus("unlisted")
@@ -59,21 +59,20 @@ class YouTubeWrapperImpl(
         override def progressChanged(uploader: MediaHttpUploader): Unit = {
           uploader.getUploadState match {
             case UploadState.MEDIA_COMPLETE =>
-              val uploadCompletedInfo = UploadCompletedInfo(runId)
-              notifyActor ! UploadCompleted(uploadCompletedInfo)
+              notifyActor ! UploadSucceeded(recordingId)
             case state =>
-              log.info(s"New upload state in $runId progress listener: $state")
+              log.info(s"New upload state in $recordingId progress listener: $state")
           }
         }
       }
 
       uploader.setProgressListener(progressListener)
 
-      log.info(s"Uploading $runId video...")
+      log.info(s"Uploading $recordingId video...")
       val returnedVideo = videoInsert.execute()
-      log.info(s"Uploaded $runId. YouTube ID: ${returnedVideo.getId}")
+      log.info(s"Uploaded $recordingId. YouTube ID: ${returnedVideo.getId}")
 
-      UploadStartedInfo(runId, returnedVideo.getId)
+      UploadStartedInfo(recordingId, returnedVideo.getId)
 
     } finally {
       inputStream.close()

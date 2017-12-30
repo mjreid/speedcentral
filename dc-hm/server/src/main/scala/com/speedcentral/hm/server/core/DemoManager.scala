@@ -3,7 +3,7 @@ package com.speedcentral.hm.server.core
 import java.util.Base64
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import com.speedcentral.hm.api.DemoRequest
+import com.speedcentral.hm.server.core.DatabaseManager._
 import com.speedcentral.hm.server.core.RecordingManager.BeginRecording
 import com.speedcentral.hm.server.core.UploadManager.UploadVideo
 
@@ -20,22 +20,31 @@ class DemoManager(
       log.info(s"Received demo request for $recordingId")
       val lmpDataBytes = Base64.getDecoder.decode(lmpData)
       recordingManager ! BeginRecording(recordingId, lmpDataBytes)
+      databaseManager ! LogExeRecordingStarted(recordingId)
 
     case RecordingComplete(recordingResult) =>
       recordingResult match {
         case RecordingFailure(recordingId, _, _) =>
           // Do something here eventually
           log.error(s"Recording failure for $recordingId")
+          databaseManager ! LogExeRecordingFailed(recordingId)
         case RecordingSuccess(recordingId, _, _, outputVideo) =>
           log.info(s"Recording succeeded for $recordingId")
+          databaseManager ! LogExeRecordingSucceeded(recordingId)
           uploadManager ! UploadVideo(recordingId, outputVideo)
       }
 
     case UploadStarted(info) =>
       log.info(s"Upload started: $info")
+      databaseManager ! LogUploadStarted(info.recordingId, info.videoId)
 
-    case UploadCompleted(info) =>
-      log.info(s"Work complete! $info")
+    case UploadFailed(recordingId, error) =>
+      log.info(s"Upload failed: $error")
+      databaseManager ! LogUploadFailed(recordingId, error)
+
+    case UploadSucceeded(recordingId) =>
+      log.info(s"Upload succeeded for $recordingId")
+      databaseManager ! LogUploadSucceeded(recordingId)
   }
 }
 
@@ -49,7 +58,9 @@ object DemoManager {
 
   case class UploadStarted(info: UploadStartedInfo)
 
-  case class UploadCompleted(info: UploadCompletedInfo)
+  case class UploadFailed(recordingId: String, error: String)
+
+  case class UploadSucceeded(recordingId: String)
 }
 
 

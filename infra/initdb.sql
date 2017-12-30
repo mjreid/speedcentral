@@ -5,23 +5,16 @@ CREATE TABLE run (
 
 CREATE TABLE recording (
   id BIGSERIAL PRIMARY KEY,
-  run_id BIGINT REFERENCES run (id) NOT NULL
+  run_id BIGINT REFERENCES run (id) NOT NULL,
+  video_id VARCHAR(64) NULL,
+  created_date TIMESTAMP NOT NULL
 );
 
 CREATE TABLE recording_history (
   id BIGSERIAL PRIMARY KEY,
-  recording_id BIGINT REFERENCES recording (id) NOT NULL
-);
-
-CREATE TABLE recording_history_state (
-  id BIGSERIAL PRIMARY KEY,
+  recording_id BIGINT REFERENCES recording (id) NOT NULL,
   state VARCHAR(64) NOT NULL,
-  description VARCHAR(512) NOT NULL
+  history_time TIMESTAMP NOT NULL
 );
 
-INSERT INTO recording_history_state (state, description) VALUES
-  ('submitted', 'Run is submitted, but has not yet started processing.'),
-  ('encoding', 'Run is being encoded.'),
-  ('uploading', 'Run is being uploaded.'),
-  ('complete', 'Run has finished uploading.'),
-  ('failed', 'Run failed, check recording history for details.');
+CREATE INDEX ix_recording_history_recording_id ON recording_history (recording_id);
