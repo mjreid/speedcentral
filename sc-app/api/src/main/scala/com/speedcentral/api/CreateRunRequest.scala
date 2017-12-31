@@ -9,5 +9,6 @@ case class CreateRunRequest(
   runner: Option[String],
   submitter: Option[String],
   category: Option[String],
-  runTime: Option[String] // ISO 8601 duration
+  runTime: Option[String], // ISO 8601 duration,
+  lmpBytes: Array[Byte]
 )

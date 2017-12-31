@@ -58,7 +58,8 @@ class DemoRouter(
                   runner,
                   submitter,
                   category,
-                  runTime
+                  runTime,
+                  lmp
                 )
                 val createdRun = lmpController.createNewRun(createRunRequest)
 

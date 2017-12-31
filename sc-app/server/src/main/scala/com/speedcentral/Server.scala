@@ -10,7 +10,9 @@ import akka.stream.ActorMaterializer
 import com.speedcentral.configuration.{CorsSupport, FeedRouter, MetadataRouter, SearchRouter}
 import com.speedcentral.controllers.{FeedController, LmpController, SearchController}
 import com.speedcentral.db.Repository
+import com.speedcentral.hm.HmClient
 import com.speedcentral.routes.DemoRouter
+import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
@@ -47,8 +49,14 @@ object Server
       feedController, executionContexts.slowExecutionContext
     ).buildRoutes()
 
+    val config = ConfigFactory.load()
+    val hmUrl = config.getString("hm.url")
+    val hmApiKey = config.getString("hm.api-key")
+    val hmClient = new HmClient(hmUrl, hmApiKey)
+
     val repository = new Repository(executionContexts.slowExecutionContext)
-    val lmpController = new LmpController(repository)
+    val lmpController = new LmpController(repository, hmClient)
+
     val demoRouter = new DemoRouter(lmpController, executionContexts.fastExecutionContext)
     val demoRoutes = demoRouter.buildRoutes()
 
