@@ -1,12 +1,12 @@
 import { fork, all } from 'redux-saga/effects';
 import {watchSearchRequest} from "../modules/search";
-import {watchNavigate} from "../modules/router";
 import {watchFeedRequest} from '../modules/feed';
+import {watchAnalyzeRequest} from "../modules/lmpanalyze";
 
 export default function* root() {
   yield all([
-    fork(watchNavigate),
     fork(watchSearchRequest),
-    fork(watchFeedRequest)
+    fork(watchFeedRequest),
+    fork(watchAnalyzeRequest)
   ]);
 }

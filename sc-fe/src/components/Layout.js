@@ -33,6 +33,11 @@ export class Layout extends Component {
                   Search
                 </Button>
               </LinkContainer>
+              <LinkContainer to="/lmpupload">
+                <Button>
+                  LMP Upload
+                </Button>
+              </LinkContainer>
             </div>
           </Col>
           <Col xs={10}>

@@ -9,5 +9,12 @@ export const api = {
     return fetch(`http://localhost:8080/feed`)
       .then(response => response.json())
       .then(json => json.feedItems);
+  },
+
+  analyzeLmp: function(lmp) {
+    return fetch(`http://localhost:8080/demo/analyze`, {
+      method: 'POST',
+      body: lmp
+    }).then(response => response.json())
   }
 };

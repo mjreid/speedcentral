@@ -8,6 +8,7 @@ import App from "../App";
 import SearchPage from "./SearchPage";
 import {Route} from "react-router-dom";
 import FeedWrapper from "./feed/FeedWrapper";
+import LmpUploadPage from "./LmpUploadPage";
 
 export default class Root extends Component {
   render() {
@@ -21,6 +22,7 @@ export default class Root extends Component {
                 <Route exact path="/" component={App} key="1" />
                 <Route path="/news" component={FeedWrapper} key="2" />
                 <Route path="/search" component={SearchPage} key="3" />
+                <Route path="/lmpupload" component={LmpUploadPage} key="4" />
               </Layout>
             </div>
           </Router>
