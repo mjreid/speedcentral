@@ -9,6 +9,7 @@ import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import com.speedcentral.configuration.{CorsSupport, FeedRouter, MetadataRouter, SearchRouter}
 import com.speedcentral.controllers.{FeedController, LmpController, SearchController}
+import com.speedcentral.db.Repository
 import com.speedcentral.routes.DemoRouter
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
@@ -45,7 +46,9 @@ object Server
     val feedRoutes = new FeedRouter(
       feedController, executionContexts.slowExecutionContext
     ).buildRoutes()
-    val lmpController = new LmpController()
+
+    val repository = new Repository(executionContexts.slowExecutionContext)
+    val lmpController = new LmpController(repository)
     val demoRouter = new DemoRouter(lmpController, executionContexts.fastExecutionContext)
     val demoRoutes = demoRouter.buildRoutes()
 

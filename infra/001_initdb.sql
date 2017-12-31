@@ -1,6 +1,16 @@
 CREATE TABLE run (
   id BIGSERIAL PRIMARY KEY,
-  submitter VARCHAR(1024) NOT NULL
+  map INT NOT NULL,
+  episode INT NOT NULL,
+  skill_level INT NOT NULL,
+  iwad VARCHAR(80) NOT NULL,
+  engine_version VARCHAR(1024) NOT NULL,
+  runner VARCHAR(1024) NULL,
+  submitter VARCHAR(1024) NULL,
+  run_category VARCHAR(1024) NULL,
+  run_time INTERVAL NULL,
+  created_date TIMESTAMP NOT NULL,
+  modified_date TIMESTAMP NOT NULL
 );
 
 CREATE TABLE recording (

@@ -16,5 +16,13 @@ export const api = {
       method: 'POST',
       body: lmp
     }).then(response => response.json())
+  },
+
+  submitRun: function(lmpData) {
+    console.log(lmpData);
+    return fetch(`http://localhost:8080/demo/submit`, {
+      method: 'POST',
+      body: lmpData,
+    }).then(response => response.json())
   }
 };

@@ -5,7 +5,8 @@ import { FormControl, FormGroup, ControlLabel } from 'react-bootstrap';
 export default class LmpFileSelector extends Component {
 
   static propTypes = {
-    lmpAnalyzeRequest: PropTypes.func.isRequired
+    lmpAnalyzeRequest: PropTypes.func.isRequired,
+    file: PropTypes.object
   };
 
   constructor(props) {

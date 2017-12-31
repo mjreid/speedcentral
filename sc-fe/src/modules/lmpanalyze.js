@@ -17,12 +17,12 @@ export function lmpAnalyzeRequest(lmp) {
   return { type: LMP_ANALYZE_REQUEST, lmp };
 }
 
-export function lmpAnalyzeSuccess(response) {
-  return { type: LMP_ANALYZE_SUCCESS, response };
+export function lmpAnalyzeSuccess(lmp, response) {
+  return { type: LMP_ANALYZE_SUCCESS, lmp, response };
 }
 
-export function lmpAnalyzeFailure(error) {
-  return { type: LMP_ANALYZE_FAILURE, error };
+export function lmpAnalyzeFailure(lmp, error) {
+  return { type: LMP_ANALYZE_FAILURE, lmp, error };
 }
 
 export function lmpAnalyzeDataChanged(updatedFields) {
@@ -34,11 +34,12 @@ export default function reducer(state = initialState, action = {}) {
     case LMP_ANALYZE_SUCCESS:
       return {
         ...state,
-        analysisResult: action.response
+        analysisResult: Object.assign({}, action.response, { lmp: action.lmp })
       };
     case LMP_ANALYZE_FAILURE:
       return {
         ...state,
+        analysisResult: { lmp: action.lmp },
         errorMessage: action.error
       };
     case LMP_ANALYZE_DATA_CHANGED:
@@ -54,9 +55,9 @@ export default function reducer(state = initialState, action = {}) {
 function* analyzeLmp(lmpAnalyzeRequest) {
   try {
     const analysisResults = yield call(api.analyzeLmp, lmpAnalyzeRequest.lmp);
-    yield put(lmpAnalyzeSuccess(analysisResults));
+    yield put(lmpAnalyzeSuccess(lmpAnalyzeRequest.lmp, analysisResults));
   } catch(error) {
-    yield put(lmpAnalyzeFailure(SERVER_FAILED));
+    yield put(lmpAnalyzeFailure(lmpAnalyzeRequest.lmp, SERVER_FAILED));
   }
 }
 

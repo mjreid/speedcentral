@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import {lmpAnalyzeDataChanged, lmpAnalyzeRequest} from '../modules/lmpanalyze';
 import LmpUploadForm from "../components/lmp/LmpUploadForm";
 import LmpFileSelector from "../components/lmp/LmpFileSelector";
+import {demoSubmitRequest} from "../modules/demosubmit";
 
 class LmpUploadPage extends Component {
 
@@ -22,17 +23,6 @@ class LmpUploadPage extends Component {
       category: PropTypes.string,
       runTime: PropTypes.number
     })
-    /*lmpData: PropTypes.shape({
-      map: PropTypes.number,
-      episode: PropTypes.number,
-      skillLevel: PropTypes.string,
-      category: PropTypes.string,
-      iwad: PropTypes.string,
-      pwads: PropTypes.array,
-      engineVersion: PropTypes.string,
-      runner: PropTypes.string,
-      submitter: PropTypes.string
-    })*/
   };
 
   static defaultProps = {
@@ -40,15 +30,18 @@ class LmpUploadPage extends Component {
   };
 
   render() {
-    const { analysisResult, lmpAnalyzeRequest, lmpAnalyzeDataChanged } = this.props;
+    const { analysisResult, lmpAnalyzeRequest, lmpAnalyzeDataChanged, submitDemoRequest } = this.props;
 
+    const lmpFileSelector = (
+      <LmpFileSelector lmpAnalyzeRequest={lmpAnalyzeRequest} />
+    );
     if (Object.keys(analysisResult).length === 0) {
-      return (
-        <LmpFileSelector lmpAnalyzeRequest={lmpAnalyzeRequest} />
-      );
+      return lmpFileSelector;
     } else {
       return (
-        <LmpUploadForm lmpAnalyzeRequest={lmpAnalyzeRequest} lmpData={analysisResult} onLmpDataChanged={lmpAnalyzeDataChanged} />
+        <LmpUploadForm lmpAnalyzeRequest={lmpAnalyzeRequest} lmpData={analysisResult} onLmpDataChanged={lmpAnalyzeDataChanged} submitDemoRequest={submitDemoRequest}>
+          {lmpFileSelector}
+        </LmpUploadForm>
       );
     }
   }
@@ -63,7 +56,8 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return({
     lmpAnalyzeRequest: (lmp) => dispatch(lmpAnalyzeRequest(lmp)),
-    lmpAnalyzeDataChanged: (updatedFields) => dispatch(lmpAnalyzeDataChanged(updatedFields))
+    lmpAnalyzeDataChanged: (updatedFields) => dispatch(lmpAnalyzeDataChanged(updatedFields)),
+    submitDemoRequest: (lmpData) => dispatch(demoSubmitRequest(lmpData))
   });
 }
 

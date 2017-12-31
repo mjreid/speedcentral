@@ -8,8 +8,8 @@ services:
       POSTGRES_USER: "speedcentral"
       POSTGRES_PASSWORD: dev
     volumes:
-      - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql:ro
-      - ./local_data.sql:/docker-entrypoint-initdb.d/local_data.sql:ro
+      - ./001_initdb.sql:/docker-entrypoint-initdb.d/001_initdb.sql:ro
+      - ./999_localdata.sql:/docker-entrypoint-initdb.d/999_localdata.sql:ro
     ports:
       - 5432:5432
 

@@ -35,7 +35,7 @@ class LmpAnalyzer(
           skillLevel = Some(skillLevel),
           map = Some(map),
           episode = Some(episode),
-          engineVersion = eng,
+          engineVersion = engine,
           iwad = iwad,
           pwads = pwads
         )

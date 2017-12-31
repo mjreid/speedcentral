@@ -9,4 +9,5 @@ object JsonFormatters extends DefaultJsonProtocol {
   implicit val feedItemFormat: RootJsonFormat[FeedItem] = jsonFormat4(FeedItem)
   implicit val feedItemsFormat: RootJsonFormat[FeedItems] = jsonFormat1(FeedItems)
   implicit val lmpAnalysisResultFormat: RootJsonFormat[LmpAnalysisResult] = jsonFormat6(LmpAnalysisResult)
+  implicit val createRunResultFormat: RootJsonFormat[CreateRunResult] = jsonFormat1(CreateRunResult)
 }
