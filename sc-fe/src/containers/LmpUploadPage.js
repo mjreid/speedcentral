@@ -1,29 +1,46 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { lmpAnalyzeRequest } from '../modules/lmpanalyze';
+import {lmpAnalyzeDataChanged, lmpAnalyzeRequest} from '../modules/lmpanalyze';
 import LmpUploadForm from "../components/lmp/LmpUploadForm";
 import LmpFileSelector from "../components/lmp/LmpFileSelector";
 
 class LmpUploadPage extends Component {
 
   static propTypes = {
+    lmpAnalyzeDataChanged: PropTypes.func,
     analysisResult: PropTypes.shape({
       map: PropTypes.number,
       pwads: PropTypes.array,
       skillLevel: PropTypes.number,
       iwad: PropTypes.string,
       episode: PropTypes.number,
-      engineVersion: PropTypes.string
+      engineVersion: PropTypes.string,
+      // The following stuff is *not* determined by the analysis
+      runner: PropTypes.string,
+      submitter: PropTypes.string,
+      category: PropTypes.string,
+      runTime: PropTypes.number
     })
+    /*lmpData: PropTypes.shape({
+      map: PropTypes.number,
+      episode: PropTypes.number,
+      skillLevel: PropTypes.string,
+      category: PropTypes.string,
+      iwad: PropTypes.string,
+      pwads: PropTypes.array,
+      engineVersion: PropTypes.string,
+      runner: PropTypes.string,
+      submitter: PropTypes.string
+    })*/
   };
 
   static defaultProps = {
-    analysisResult: {}
+    analysisResult: {},
   };
 
   render() {
-    const { analysisResult, lmpAnalyzeRequest } = this.props;
+    const { analysisResult, lmpAnalyzeRequest, lmpAnalyzeDataChanged } = this.props;
 
     if (Object.keys(analysisResult).length === 0) {
       return (
@@ -31,7 +48,7 @@ class LmpUploadPage extends Component {
       );
     } else {
       return (
-        <LmpUploadForm lmpAnalyzeRequest={lmpAnalyzeRequest} analysisResult={analysisResult} />
+        <LmpUploadForm lmpAnalyzeRequest={lmpAnalyzeRequest} lmpData={analysisResult} onLmpDataChanged={lmpAnalyzeDataChanged} />
       );
     }
   }
@@ -45,7 +62,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return({
-    lmpAnalyzeRequest: (lmp) => dispatch(lmpAnalyzeRequest(lmp))
+    lmpAnalyzeRequest: (lmp) => dispatch(lmpAnalyzeRequest(lmp)),
+    lmpAnalyzeDataChanged: (updatedFields) => dispatch(lmpAnalyzeDataChanged(updatedFields))
   });
 }
 

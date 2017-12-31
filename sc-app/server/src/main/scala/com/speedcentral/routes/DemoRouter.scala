@@ -1,6 +1,5 @@
 package com.speedcentral.routes
 
-import akka.http.scaladsl.server.Route
 import com.speedcentral.configuration.ScRouteDefinition
 import com.speedcentral.controllers.LmpController
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport

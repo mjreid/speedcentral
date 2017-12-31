@@ -1,17 +1,20 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import LmpFileSelector from "./LmpFileSelector";
-import { Button } from 'react-bootstrap';
+import {Button, Form} from 'react-bootstrap';
+import LmpIwadSelector from "./LmpIwadSelector";
+import LmpMapSelector from "./LmpMapSelector";
 
 export default class LmpUploadForm extends Component {
 
   static propTypes = {
     lmpAnalyzeRequest: PropTypes.func,
-    analysisResult: PropTypes.object
+    lmpData: PropTypes.object,
+    onLmpDataChanged: PropTypes.func
   };
 
   static defaultProps = {
-    analysisResult: {}
+    lmpData: {}
   };
 
   constructor(props) {
@@ -22,15 +25,17 @@ export default class LmpUploadForm extends Component {
   onFormSubmit(e) {
     e.preventDefault();
   }
-
+//<LmpMapSelector episode={lmpData.episode} map={lmpData.map} onLmpDataChanged={onLmpDataChanged} />
   render() {
-    const { lmpAnalyzeRequest, analysisResult } = this.props;
+    const { lmpAnalyzeRequest, lmpData, onLmpDataChanged } = this.props;
 
     return (
-      <form onSubmit={this.onFormSubmit}>
+      <Form horizontal onSubmit={this.onFormSubmit}>
         <LmpFileSelector lmpAnalyzeRequest={lmpAnalyzeRequest} />
+        <LmpIwadSelector iwad={lmpData.iwad} onLmpDataChanged={onLmpDataChanged} />
+        <LmpMapSelector iwad={lmpData.iwad} onLmpDataChanged={onLmpDataChanged} episode={lmpData.episode} map={lmpData.map} />
         <Button type="submit">Submit</Button>
-      </form>
+      </Form>
     );
   }
 }
