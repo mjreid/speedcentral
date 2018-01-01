@@ -1,6 +1,6 @@
 package com.speedcentral.db
 
-import java.time.{Duration, Instant}
+import java.time.Instant
 
 import scalikejdbc._
 
@@ -24,6 +24,7 @@ object Run extends SQLSyntaxSupport[Run] {
   override val columns = Seq("id", "map", "episode", "skill_level", "iwad", "engine_version",
     "runner", "submitter", "run_category", "run_time", "created_date", "modified_date")
 
+  def apply(r: SyntaxProvider[Run])(rs: WrappedResultSet): Run = apply(r.resultName)(rs)
   def apply(run: ResultName[Run])(rs: WrappedResultSet): Run = {
     new Run(
       rs.long(run.id),

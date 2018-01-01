@@ -10,6 +10,7 @@ class LmpUploadPage extends Component {
 
   static propTypes = {
     lmpAnalyzeDataChanged: PropTypes.func,
+    submitDemoRequest: PropTypes.func,
     analysisResult: PropTypes.shape({
       map: PropTypes.number,
       pwads: PropTypes.array,

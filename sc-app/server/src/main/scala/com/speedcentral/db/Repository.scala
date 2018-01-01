@@ -38,4 +38,18 @@ class Repository(
       }
     }
   }
+
+  def loadRun(runId: Long)(implicit session: DBSession = ReadOnlyAutoSession): Future[Option[(Run, Seq[Recording], Seq[RecordingHistory])]] = {
+    Future {
+      val (run, rec, rech) = (Run.syntax("run"), Recording.syntax("rec"), RecordingHistory.syntax("rech"))
+      val maybeRun: Option[Run] = withSQL { select.from(Run as run).where.eq(run.id, runId) }.map(Run(run)).single().apply()
+      maybeRun.map { run =>
+        val recordings: List[Recording] = withSQL { select.from(Recording as rec).where.eq(rec.runId, runId) }.map(Recording(rec)).list().apply()
+        val recordingIds = recordings.map(r => r.id)
+        val recordingHistories: List[RecordingHistory] =
+          withSQL { select.from(RecordingHistory as rech).where.in(rech.recordingId, recordingIds) }.map(RecordingHistory(rech)).list().apply()
+        (run, recordings, recordingHistories)
+      }
+    }
+  }
 }

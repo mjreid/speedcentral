@@ -41,31 +41,40 @@ class DemoRouter(
             }
           }
         } ~
-          path("submit") {
-            formFields("iwad", "map".as[Int], "lmp".as[ByteString], "skillLevel".as[Int], "pwads".as[Seq[String]].?,
-              "engineVersion", "episode".as[Int], "runner".?, "submitter".?, "category".?, "runTime".?) {
-              (iwad, map, lmpByteString, skillLevel, pwads, engineVersion,
-                episode, runner, submitter, category, runTime) =>
+        path("submit") {
+          formFields("iwad", "map".as[Int], "lmp".as[ByteString], "skillLevel".as[Int], "pwads".as[Seq[String]].?,
+            "engineVersion", "episode".as[Int], "runner".?, "submitter".?, "category".?, "runTime".?) {
+            (iwad, map, lmpByteString, skillLevel, pwads, engineVersion,
+              episode, runner, submitter, category, runTime) =>
 
 
-                val lmp = lmpByteString.toArray[Byte]
-                val createRunRequest = CreateRunRequest(
-                  map,
-                  episode,
-                  skillLevel,
-                  iwad,
-                  engineVersion,
-                  runner,
-                  submitter,
-                  category,
-                  runTime,
-                  lmp
-                )
-                val createdRun = lmpController.createNewRun(createRunRequest)
+              val lmp = lmpByteString.toArray[Byte]
+              val createRunRequest = CreateRunRequest(
+                map,
+                episode,
+                skillLevel,
+                iwad,
+                engineVersion,
+                runner,
+                submitter,
+                category,
+                runTime,
+                lmp
+              )
+              val createdRun = lmpController.createNewRun(createRunRequest)
 
-                complete(createdRun)
+              complete(createdRun)
+          }
+        } ~
+        path("status") {
+          get {
+            parameters('runId) { runId =>
+              onSuccess(lmpController.getRunStatus(runId)) { runStatusResponse =>
+                complete(runStatusResponse)
+              }
             }
           }
+        }
       }
     }
   }

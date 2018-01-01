@@ -24,7 +24,8 @@ CREATE TABLE recording_history (
   id BIGSERIAL PRIMARY KEY,
   recording_id BIGINT REFERENCES recording (id) NOT NULL,
   state VARCHAR(64) NOT NULL,
-  history_time TIMESTAMP NOT NULL
+  history_time TIMESTAMP NOT NULL,
+  details TEXT NULL
 );
 
 CREATE INDEX ix_recording_history_recording_id ON recording_history (recording_id);
