@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import * as Helpers from '../../services/helpers';
 import RecordingStatusHistory from "./RecordingStatusHistory";
 
 export default class RecordingStatus extends Component {
