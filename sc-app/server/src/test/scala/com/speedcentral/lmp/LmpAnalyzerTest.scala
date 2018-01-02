@@ -2,7 +2,7 @@ package com.speedcentral.lmp
 
 import java.io.InputStream
 
-import com.speedcentral.api.Pwad
+import com.speedcentral.api.ApiPwad
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.scalatest.time.{Millis, Seconds, Span}
@@ -25,7 +25,7 @@ class LmpAnalyzerTest extends FlatSpec with Matchers with ScalaFutures with Befo
     classicBoomDemo = streamToBytes(classLoader.getResourceAsStream("classic-boom-demo.LMP"))
     prboomPlusDemo = streamToBytes(classLoader.getResourceAsStream("prboom-plus-demo.lmp"))
     multiWadPrboomDemo = streamToBytes(classLoader.getResourceAsStream("multiwad-test.lmp"))
-    val pwadAnalyzer = new PwadAnalyzer("http://www.gamers.org/pub/idgames")
+    val pwadAnalyzer = new PwadAnalyzer("http://www.gamers.org/pub/idgames") // "unit test", sure...
     lmpAnalyzer = new LmpAnalyzer(pwadAnalyzer)
   }
 
@@ -69,15 +69,15 @@ class LmpAnalyzerTest extends FlatSpec with Matchers with ScalaFutures with Befo
     val resultF = lmpAnalyzer.analyze(prboomPlusDemo)
     whenReady(resultF) { result =>
       result.iwad should be ("doom2")
-      result.primaryPwad should be(Some(Pwad("prwrcol2", "/levels/doom2/p-r/prwrcol2.zip")))
+      result.primaryPwad should be(Some(ApiPwad("prwrcol2", "/levels/doom2/p-r/prwrcol2.zip")))
     }
   }
 
   it should "parse Prboom-Plus wad information properly when there are multiple wads" in {
     val resultF = lmpAnalyzer.analyze(multiWadPrboomDemo)
     whenReady(resultF) { result =>
-      result.primaryPwad should be(Some(Pwad("mm2", "/themes/mm/mm2.zip")))
-      result.secondaryPwads should be(Seq(Pwad("mm2mus", "/themes/mm/mm2.zip")))
+      result.primaryPwad should be(Some(ApiPwad("mm2", "/themes/mm/mm2.zip")))
+      result.secondaryPwads should be(Seq(ApiPwad("mm2mus", "/themes/mm/mm2.zip")))
     }
   }
 

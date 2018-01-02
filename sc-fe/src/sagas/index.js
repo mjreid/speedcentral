@@ -4,6 +4,7 @@ import {watchFeedRequest} from '../modules/feed';
 import {watchAnalyzeRequest} from "../modules/lmpanalyze";
 import {watchDemoSubmitRequest} from "../modules/demosubmit";
 import {watchRunStatusRequest} from "../modules/runstatus";
+import {watchPwadResolveRequest} from "../modules/lmpanalyze";
 
 export default function* root() {
   yield all([
@@ -11,6 +12,7 @@ export default function* root() {
     fork(watchFeedRequest),
     fork(watchAnalyzeRequest),
     fork(watchDemoSubmitRequest),
-    fork(watchRunStatusRequest)
+    fork(watchRunStatusRequest),
+    fork(watchPwadResolveRequest)
   ]);
 }

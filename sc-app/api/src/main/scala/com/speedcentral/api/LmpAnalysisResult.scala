@@ -6,6 +6,6 @@ case class LmpAnalysisResult(
   skillLevel: Option[Int],
   engineVersion: Option[String],
   iwad: String,
-  primaryPwad: Option[Pwad],
-  secondaryPwads: Seq[Pwad]
+  primaryPwad: Option[ApiPwad],
+  secondaryPwads: Seq[ApiPwad]
 )

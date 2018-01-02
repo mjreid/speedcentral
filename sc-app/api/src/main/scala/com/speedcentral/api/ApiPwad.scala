@@ -1,6 +1,6 @@
 package com.speedcentral.api
 
-case class Pwad(
+case class ApiPwad(
   pwadFilename: String,
   pwadIdgamesLocation: String
 )

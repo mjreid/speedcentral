@@ -4,13 +4,15 @@ import {Button, Col, Form, Row} from 'react-bootstrap';
 import LmpIwadSelector from "./LmpIwadSelector";
 import LmpMapSelector from "./LmpMapSelector";
 import LmpCategorySelector from "./LmpCategorySelector";
+import LmpPrimaryPwadSelector from "./LmpPrimaryPwadSelector";
 
 export default class LmpUploadForm extends Component {
 
   static propTypes = {
     lmpData: PropTypes.object,
     onLmpDataChanged: PropTypes.func,
-    submitDemoRequest: PropTypes.func
+    submitDemoRequest: PropTypes.func,
+    pwadResolveRequest: PropTypes.func
   };
 
   static defaultProps = {
@@ -44,13 +46,14 @@ export default class LmpUploadForm extends Component {
   }
 //<LmpMapSelector episode={lmpData.episode} map={lmpData.map} onLmpDataChanged={onLmpDataChanged} />
   render() {
-    const { lmpData, onLmpDataChanged } = this.props;
+    const { lmpData, onLmpDataChanged, pwadResolveRequest } = this.props;
 
     return (
       <Form horizontal onSubmit={this.onFormSubmit}>
         <LmpIwadSelector iwad={lmpData.iwad} onLmpDataChanged={onLmpDataChanged} />
         <LmpMapSelector iwad={lmpData.iwad} onLmpDataChanged={onLmpDataChanged} episode={lmpData.episode} map={lmpData.map} />
         <LmpCategorySelector category={lmpData.category} onLmpDataChanged={onLmpDataChanged} />
+        <LmpPrimaryPwadSelector pwadResolveRequest={pwadResolveRequest} onLmpDataChanged={onLmpDataChanged} iwad={lmpData.iwad} pwad={lmpData.primaryPwad} />
         <Row className="BgOne">
           <Col xs={8} />
           <Col xs={4}>

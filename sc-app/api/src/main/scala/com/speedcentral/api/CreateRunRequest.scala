@@ -10,5 +10,7 @@ case class CreateRunRequest(
   submitter: Option[String],
   category: Option[String],
   runTime: Option[String], // ISO 8601 duration,
+  primaryPwad: Option[ApiPwad],
+  secondaryPwads: Seq[ApiPwad],
   lmpBytes: Array[Byte]
 )

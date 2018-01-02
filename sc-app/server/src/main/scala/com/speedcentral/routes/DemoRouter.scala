@@ -8,7 +8,7 @@ import akka.http.scaladsl.server.Route
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import akka.util.{ByteString, Timeout}
-import com.speedcentral.api.{CreateRunRequest, CreateRunResult}
+import com.speedcentral.api.{CreateRunRequest, ApiPwad}
 import com.speedcentral.api.JsonFormatters._
 import org.slf4j.LoggerFactory
 
@@ -25,6 +25,17 @@ class DemoRouter(
   private val timeoutDuration = 10.seconds
 
   override def buildRoutes(): Route = {
+    pathPrefix("pwad") {
+      path("resolve") {
+        get {
+          parameters('pwadFilename, 'iwad) { (pwadFilename, iwad) =>
+            onSuccess(lmpController.resolvePwad(pwadFilename, iwad)) { maybePwad =>
+              complete(maybePwad)
+            }
+          }
+        }
+      }
+    } ~
     toStrictEntity(timeoutDuration) {
       pathPrefix("demo") {
         path("analyze") {
@@ -42,10 +53,11 @@ class DemoRouter(
           }
         } ~
         path("submit") {
-          formFields("iwad", "map".as[Int], "lmp".as[ByteString], "skillLevel".as[Int], "pwads".as[Seq[String]].?,
-            "engineVersion", "episode".as[Int], "runner".?, "submitter".?, "category".?, "runTime".?) {
-            (iwad, map, lmpByteString, skillLevel, pwads, engineVersion,
-              episode, runner, submitter, category, runTime) =>
+          formFields("iwad", "map".as[Int], "lmp".as[ByteString], "skillLevel".as[Int],
+            "engineVersion", "episode".as[Int], "runner".?, "submitter".?,
+            "category".?, "runTime".?, "primaryPwad".as[ApiPwad].?, "secondaryPwads".as[Seq[ApiPwad]]) {
+            (iwad, map, lmpByteString, skillLevel, engineVersion,
+              episode, runner, submitter, category, runTime, primaryPwad, secondaryPwads) =>
 
 
               val lmp = lmpByteString.toArray[Byte]
@@ -59,6 +71,8 @@ class DemoRouter(
                 submitter,
                 category,
                 runTime,
+                primaryPwad,
+                secondaryPwads,
                 lmp
               )
               val createdRun = lmpController.createNewRun(createRunRequest)

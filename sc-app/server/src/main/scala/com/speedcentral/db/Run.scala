@@ -10,6 +10,7 @@ case class Run(
   episode: Int,
   skillLevel: Int,
   iwad: String,
+  primaryPwadId: Long,
   engineVersion: String,
   runner: Option[String],
   submitter: Option[String],
@@ -21,7 +22,7 @@ case class Run(
 
 object Run extends SQLSyntaxSupport[Run] {
   override val tableName = "run"
-  override val columns = Seq("id", "map", "episode", "skill_level", "iwad", "engine_version",
+  override val columns = Seq("id", "map", "episode", "skill_level", "iwad", "primary_pwad_id", "engine_version",
     "runner", "submitter", "run_category", "run_time", "created_date", "modified_date")
 
   def apply(r: SyntaxProvider[Run])(rs: WrappedResultSet): Run = apply(r.resultName)(rs)
@@ -32,6 +33,7 @@ object Run extends SQLSyntaxSupport[Run] {
       rs.int(run.episode),
       rs.int(run.skillLevel),
       rs.string(run.iwad),
+      rs.long(run.primaryPwadId),
       rs.string(run.engineVersion),
       rs.stringOpt(run.runner),
       rs.stringOpt(run.submitter),

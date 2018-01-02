@@ -1,10 +1,10 @@
 package com.speedcentral.controllers
 
 import com.speedcentral.ScAppException
-import com.speedcentral.api.{CreateRunRequest, CreateRunResult, LmpAnalysisResult, RunStatusResponse}
+import com.speedcentral.api._
 import com.speedcentral.db.{ApiConverter, Repository}
 import com.speedcentral.hm.HmClient
-import com.speedcentral.lmp.LmpAnalyzer
+import com.speedcentral.lmp.{LmpAnalyzer, PwadAnalyzer}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Success
@@ -12,13 +12,18 @@ import scala.util.Success
 class LmpController(
   repository: Repository,
   hmClient: HmClient,
-  lmpAnalyzer: LmpAnalyzer
+  lmpAnalyzer: LmpAnalyzer,
+  pwadAnalyzer: PwadAnalyzer
 ) {
 
   val apiConverter = new ApiConverter
 
   def analyzeLmp(lmp: Array[Byte])(implicit ec: ExecutionContext): Future[LmpAnalysisResult] = {
     lmpAnalyzer.analyze(lmp)
+  }
+
+  def resolvePwad(pwadFilename: String, iwad: String)(implicit executionContext: ExecutionContext): Future[Option[ApiPwad]] = {
+    pwadAnalyzer.resolvePwadPath(pwadFilename, iwad)
   }
 
   def createNewRun(createRunRequest: CreateRunRequest)(implicit ec: ExecutionContext): Future[CreateRunResult] = {

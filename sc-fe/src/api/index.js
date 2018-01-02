@@ -29,5 +29,10 @@ export const api = {
     return fetch(`http://localhost:8080/demo/status?runId=${runId}`)
       .then(response => response.json())
       .then(json => json.run);
+  },
+
+  resolvePwad: function(pwadFilename, iwad) {
+    return fetch(`http://localhost:8080/pwad/resolve?pwadFilename=${pwadFilename}&iwad=${iwad}`)
+      .then(response => response.json());
   }
 };

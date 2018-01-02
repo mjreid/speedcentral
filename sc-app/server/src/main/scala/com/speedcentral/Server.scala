@@ -59,7 +59,7 @@ object Server
     val lmpAnalyzer = new LmpAnalyzer(pwadAnalyzer)
 
     val repository = new Repository(executionContexts.slowExecutionContext)
-    val lmpController = new LmpController(repository, hmClient, lmpAnalyzer)
+    val lmpController = new LmpController(repository, hmClient, lmpAnalyzer, pwadAnalyzer)
 
     val demoRouter = new DemoRouter(lmpController, executionContexts.fastExecutionContext)
     val demoRoutes = demoRouter.buildRoutes()

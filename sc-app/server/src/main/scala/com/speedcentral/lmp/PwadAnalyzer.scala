@@ -5,7 +5,7 @@ import akka.http.scaladsl._
 import akka.http.scaladsl.model._
 import akka.stream.ActorMaterializer
 import com.speedcentral.ScAppException
-import com.speedcentral.api.Pwad
+import com.speedcentral.api.ApiPwad
 
 import scala.concurrent.Future
 
@@ -78,17 +78,17 @@ class PwadAnalyzer(
     "valiant" -> "valiant.zip"
   )
 
-  def resolvePwadPath(pwadName: String, iwad: String): Future[Option[Pwad]] = {
+  def resolvePwadPath(pwadName: String, iwad: String): Future[Option[ApiPwad]] = {
     // If the pwad already contains a '/' character we'll assume it's a full path already.
     if (pwadName.contains("/")) {
-      Future.successful(Some(Pwad(pwadName, pwadName)))
+      Future.successful(Some(ApiPwad(pwadName, pwadName)))
     } else {
       if (specialWads.contains(pwadName)) {
-        Future.successful(Some(Pwad(pwadName, specialWads(pwadName))))
+        Future.successful(Some(ApiPwad(pwadName, specialWads(pwadName))))
       } else if (doom2Megawads.contains(pwadName)) {
-        Future.successful(Some(Pwad(pwadName, s"$doom2MegawadPrefix${doom2Megawads(pwadName)}")))
+        Future.successful(Some(ApiPwad(pwadName, s"$doom2MegawadPrefix/${doom2Megawads(pwadName)}")))
       } else if (doom2PortMegawads.contains(pwadName)) {
-        Future.successful(Some(Pwad(pwadName, s"$doom2PortMegawadPrefix${doom2PortMegawads(pwadName)}")))
+        Future.successful(Some(ApiPwad(pwadName, s"$doom2PortMegawadPrefix/${doom2PortMegawads(pwadName)}")))
       } else {
 
         val basePath = if (iwad == "doom") {
@@ -103,12 +103,12 @@ class PwadAnalyzer(
         val idgamesPath = s"$basePath$bucket/$pwadName.zip"
         checkPwadExistence(idgamesPath).flatMap { exists =>
           if (exists) {
-            Future.successful(Some(Pwad(pwadName, idgamesPath)))
+            Future.successful(Some(ApiPwad(pwadName, idgamesPath)))
           } else {
             // test Ports folder
             val portsIdgamesPath = s"$basePath$portsSubdirectory$bucket/$pwadName.zip"
             checkPwadExistence(portsIdgamesPath).map { exists =>
-              if (exists) Some(Pwad(pwadName, portsIdgamesPath))
+              if (exists) Some(ApiPwad(pwadName, portsIdgamesPath))
               else None
             }
           }
