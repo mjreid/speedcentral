@@ -20,6 +20,8 @@ class DemoManager(
       log.info(s"Received demo request for $recordingId")
       val lmpDataBytes = Base64.getDecoder.decode(lmpData)
       recordingManager ! BeginRecording(recordingId, lmpDataBytes)
+
+    case RecordingStarted(recordingId) =>
       databaseManager ! LogExeRecordingStarted(recordingId)
 
     case RecordingComplete(recordingResult) =>
@@ -53,6 +55,8 @@ object DemoManager {
     Props(new DemoManager(databaseManager, recordingManager, uploadManager))
 
   case class StartDemo(recordingId: String, lmpData: String)
+
+  case class RecordingStarted(recordingId: String)
 
   case class RecordingComplete(recordingResult: RecordingResult)
 

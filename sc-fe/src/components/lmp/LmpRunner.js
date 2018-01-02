@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
+import {FormGroup, ControlLabel, FormControl, Col} from 'react-bootstrap';
 
 
 export default class LmpRunner extends Component {
@@ -24,9 +24,13 @@ export default class LmpRunner extends Component {
   render() {
     return (
       <div>
-        <FormGroup controlId="runner">
-          <ControlLabel>Runner</ControlLabel>
-          <FormControl id="runner" type="text" value={this.props.runner} onChange={this.handleChange} />
+        <FormGroup bsSize="sm" controlId="runner">
+          <Col sm={2}>
+            Runner
+          </Col>
+          <Col sm={10}>
+            <FormControl id="runner" type="text" value={this.props.runner} onChange={this.handleChange} />
+          </Col>
         </FormGroup>
       </div>
     );

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
+import {FormGroup, ControlLabel, FormControl, Col} from 'react-bootstrap';
 
 export default class LmpSubmitter extends Component {
 
@@ -22,12 +22,14 @@ export default class LmpSubmitter extends Component {
 
   render() {
     return (
-      <div>
-        <FormGroup controlId="submitter">
-          <ControlLabel>Runner</ControlLabel>
+      <FormGroup controlId="submitter">
+        <Col sm={2}>
+          Submitter
+        </Col>
+        <Col sm={10}>
           <FormControl id="submitter" type="text" value={this.props.submitter} onChange={this.handleChange} />
-        </FormGroup>
-      </div>
+        </Col>
+      </FormGroup>
     );
   }
 }

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { FormControl, FormGroup, ControlLabel } from 'react-bootstrap';
+import {FormControl, FormGroup, ControlLabel, Col, Row} from 'react-bootstrap';
+import './Lmp.css'
 
 export default class LmpFileSelector extends Component {
 
@@ -28,9 +29,13 @@ export default class LmpFileSelector extends Component {
 
   render() {
     return (
-      <FormGroup controlId="lmpFileSelector">
-        <ControlLabel>Select LMP</ControlLabel>
-        <FormControl id="lmpFileSelector" type="file" onChange={this.onChange} />
+      <FormGroup controlId="lmpFileSelector" className="LmpUploadControl BgOne">
+        <Col componentClass={ControlLabel} sm={2}>
+          Select LMP
+        </Col>
+        <Col sm={10}>
+          <FormControl id="lmpFileSelector" type="file" onChange={this.onChange} />
+        </Col>
       </FormGroup>
     );
   }

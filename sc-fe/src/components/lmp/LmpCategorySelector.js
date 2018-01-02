@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
+import {FormGroup, ControlLabel, FormControl, Col} from 'react-bootstrap';
 
 export default class LmpCategorySelector extends Component {
 
@@ -22,14 +22,18 @@ export default class LmpCategorySelector extends Component {
 
   render() {
     return (
-      <FormGroup controlId="category">
-        <ControlLabel>Category</ControlLabel>
-        <FormControl componentClass="select" value={this.props.category} onChange={this.handleChange} >
-          <option value="uv-max">UV Max</option>
-          <option value="uv-speed">UV Speed</option>
-          <option value="nm-speed">NM Speed</option>
-          <option value="nm100">NM100</option>
-        </FormControl>
+      <FormGroup bsSize="sm" controlId="category" className="LmpUploadControl BgTwo">
+        <Col componentClass={ControlLabel} sm={2}>
+          Category
+        </Col>
+        <Col sm={10}>
+          <FormControl componentClass="select" value={this.props.category} onChange={this.handleChange} >
+            <option value="uv-max">UV Max</option>
+            <option value="uv-speed">UV Speed</option>
+            <option value="nm-speed">NM Speed</option>
+            <option value="nm100">NM100</option>
+          </FormControl>
+        </Col>
       </FormGroup>
     );
   }

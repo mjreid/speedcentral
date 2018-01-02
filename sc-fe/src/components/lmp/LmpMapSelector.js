@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
-
+import {FormGroup, ControlLabel, FormControl, Col} from 'react-bootstrap';
+import "./Lmp.css"
 
 export default class LmpMapSelector extends Component {
 
@@ -38,24 +38,32 @@ export default class LmpMapSelector extends Component {
     if (this.props.iwad === "doom") {
       return (
         <div>
-          <FormGroup controlId="episode">
-            <ControlLabel>Episode</ControlLabel>
-            <FormControl id="episode" type="text" value={this.props.episode} onChange={this.handleEpisodeChange} />
-          </FormGroup>
-          <FormGroup controlId="map">
-            <ControlLabel>Map</ControlLabel>
-            <FormControl id="map" type="text" value={this.props.map} onChange={this.handleMapChange} />
+          <FormGroup bsSize="sm" controlId="episode" className="LmpUploadControl BgOne">
+            <Col componentClass={ControlLabel} sm={2}>
+              Episode
+            </Col>
+            <Col sm={4}>
+              <FormControl type="text" value={this.props.episode} onChange={this.handleEpisodeChange} />
+            </Col>
+            <Col componentClass={ControlLabel} sm={2}>
+              Map
+            </Col>
+            <Col sm={4}>
+              <FormControl type="text" value={this.props.map} onChange={this.handleMapChange} />
+            </Col>
           </FormGroup>
         </div>
       )
     } else {
       return (
-        <div>
-          <FormGroup controlId="map">
-            <ControlLabel>Map</ControlLabel>
-            <FormControl id="map" type="text" value={this.props.map} onChange={this.handleMapChange} />
-          </FormGroup>
-        </div>
+        <FormGroup bsSize="sm" controlId="map" className="LmpUploadControl BgOne">
+          <Col componentClass={ControlLabel} sm={2}>
+            Map
+          </Col>
+          <Col sm={10}>
+            <FormControl type="text" value={this.props.map} onChange={this.handleMapChange} />
+          </Col>
+        </FormGroup>
       );
     }
   }

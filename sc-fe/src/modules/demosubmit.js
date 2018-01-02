@@ -1,6 +1,7 @@
 import {call, put, takeEvery} from "redux-saga/effects";
 import {api} from "../api";
 import {SERVER_FAILED} from "../constants/messages";
+import {history} from "../services";
 
 const DEMO_SUBMIT_REQUEST = 'sc-fe/demosubmit/REQUEST';
 const DEMO_SUBMIT_SUCCESS = 'sc-fe/demosubmit/SUCCESS';
@@ -27,7 +28,7 @@ export default function reducer(state = initialState, action = {}) {
     case DEMO_SUBMIT_SUCCESS:
       return {
         ...state,
-        demoId: action.response.demoId
+        demoId: action.response.runId
       };
     case DEMO_SUBMIT_FAILURE:
       return {
@@ -43,6 +44,7 @@ function* submitDemo(demoRequest) {
   try {
     const demoSubmissionResult = yield call(api.submitRun, demoRequest.lmpData);
     yield put(demoSubmitSuccess(demoSubmissionResult));
+    yield put(history.push(`run/${demoSubmissionResult.runId}`))
   } catch(error) {
     yield put(demoSubmitFailure(SERVER_FAILED));
   }

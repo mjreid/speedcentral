@@ -15,7 +15,15 @@ class RunStatusPage extends Component {
 
   componentWillMount() {
     const { runId } = this.props.match.params;
-    this.props.runStatusRequest(runId);
+    const { runStatusRequest } = this.props;
+    runStatusRequest(runId);
+    this.interval = setInterval(function () { runStatusRequest(runId); }, 2000);
+  }
+
+  componentWillUnmount() {
+    if (this.interval) {
+      this.clearInterval(this.interval);
+    }
   }
 
   render() {

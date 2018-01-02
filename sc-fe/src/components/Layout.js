@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import {Grid, Row, Col} from 'react-bootstrap';
 import {LinkContainer} from "react-router-bootstrap";
 import Button from "react-bootstrap/es/Button";
+import LayoutHeader from "./LayoutHeader";
 
 export class Layout extends Component {
 
@@ -10,39 +11,21 @@ export class Layout extends Component {
       <Grid>
         <Row className="show-grid">
           <Col xs={12}>
-            <div>
-              Top Navbar Goes Here
-            </div>
+            <LayoutHeader />
           </Col>
         </Row>
         <Row className="showGrid">
-          <Col xs={2}>
+          <Col xs={1} md={1} lg={1}>
             <div>
-              <LinkContainer to="/">
-                <Button>
-                  Home
-                </Button>
-              </LinkContainer>
-              <LinkContainer to="/news">
-                <Button>
-                  News
-                </Button>
-              </LinkContainer>
-              <LinkContainer to="/search">
-                <Button>
-                  Search
-                </Button>
-              </LinkContainer>
-              <LinkContainer to="/lmpupload">
-                <Button>
-                  LMP Upload
-                </Button>
-              </LinkContainer>
             </div>
           </Col>
-          <Col xs={10}>
+          <Col xs={10} md={8} lg={6}>
             <div>
               {this.props.children}
+            </div>
+          </Col>
+          <Col xs={1} md={3} lg={5}>
+            <div>
             </div>
           </Col>
         </Row>

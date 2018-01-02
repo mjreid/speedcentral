@@ -1,7 +1,7 @@
 package com.speedcentral.hm.server.core
 
 import akka.actor.{Actor, ActorLogging, Props}
-import com.speedcentral.hm.server.core.DemoManager.RecordingComplete
+import com.speedcentral.hm.server.core.DemoManager.{RecordingComplete, RecordingStarted}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -19,6 +19,7 @@ class RecordingManager(
       val requestor = sender()
       // Run the beginRecording call on the separate EC.
       Future {
+        requestor ! RecordingStarted(recordingId)
         recorder.beginRecording(recordingId, lmp)
       }(recordingExecutionContext).onComplete {
         case Success(recordingResult) =>

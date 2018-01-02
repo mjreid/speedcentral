@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
+import {FormGroup, ControlLabel, FormControl, Col} from 'react-bootstrap';
 
 
 export default class LmpIwadSelector extends Component {
@@ -25,12 +25,16 @@ export default class LmpIwadSelector extends Component {
   render() {
     // Adblock Plus blocks elements with id "iwad" (WTF?)
     return (
-      <FormGroup controlId="doomIwad">
-        <ControlLabel>IWAD</ControlLabel>
-        <FormControl componentClass="select" placeholder="doom2" value={this.props.iwad} onChange={this.handleChange} >
-          <option value="doom">doom</option>
-          <option value="doom2">doom2</option>
-        </FormControl>
+      <FormGroup controlId="doomIwad" className="LmpUploadControl BgTwo" bsSize="sm">
+        <Col componentClass={ControlLabel} sm={2}>
+          IWAD
+        </Col>
+        <Col sm={10}>
+          <FormControl componentClass="select" placeholder="doom2" value={this.props.iwad} onChange={this.handleChange} >
+            <option value="doom">Doom</option>
+            <option value="doom2">Doom 2</option>
+          </FormControl>
+        </Col>
       </FormGroup>
     );
   }

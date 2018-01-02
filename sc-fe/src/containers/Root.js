@@ -20,11 +20,8 @@ export default class Root extends Component {
           <Router history={history}>
             <div>
               <Layout>
-                <Route exact path="/" component={App} key="1" />
-                <Route path="/news" component={FeedWrapper} key="2" />
-                <Route path="/search" component={SearchPage} key="3" />
-                <Route path="/lmpupload" component={LmpUploadPage} key="4" />
-                <Route path="/run/:runId" component={RunStatusPage} key="5" />
+                <Route exact path="/" component={LmpUploadPage} key="1" />
+                <Route path="/run/:runId" component={RunStatusPage} key="2" />
               </Layout>
             </div>
           </Router>

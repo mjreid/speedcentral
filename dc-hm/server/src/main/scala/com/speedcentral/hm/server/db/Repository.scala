@@ -25,6 +25,10 @@ class Repository(
         val maybeRecording = sql"""select ${r.result.*} from ${Recording.as(r)} where ${r.id} = ${insertedId}"""
           .map(Recording(r.resultName)).single().apply()
 
+        val currentTime = Instant.now()
+        sql"""insert into recording_history (recording_id, state, history_time)
+             values (${insertedId}, 'run_received', ${currentTime})""".update().apply()
+
         maybeRecording.getOrElse(throw HmDbException(s"Could not find recording with id $insertedId"))
       }
     }

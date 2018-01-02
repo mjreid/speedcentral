@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {Button, Form} from 'react-bootstrap';
+import {Button, Col, Form, Row} from 'react-bootstrap';
 import LmpIwadSelector from "./LmpIwadSelector";
 import LmpMapSelector from "./LmpMapSelector";
 import LmpCategorySelector from "./LmpCategorySelector";
@@ -48,12 +48,16 @@ export default class LmpUploadForm extends Component {
 
     return (
       <Form horizontal onSubmit={this.onFormSubmit}>
-        {this.props.children}
         <LmpIwadSelector iwad={lmpData.iwad} onLmpDataChanged={onLmpDataChanged} />
         <LmpMapSelector iwad={lmpData.iwad} onLmpDataChanged={onLmpDataChanged} episode={lmpData.episode} map={lmpData.map} />
         <LmpCategorySelector category={lmpData.category} onLmpDataChanged={onLmpDataChanged} />
+        <Row className="BgOne">
+          <Col xs={8} />
+          <Col xs={4}>
+            <Button type="submit">Submit</Button>
+          </Col>
+        </Row>
 
-        <Button type="submit">Submit</Button>
       </Form>
     );
   }
