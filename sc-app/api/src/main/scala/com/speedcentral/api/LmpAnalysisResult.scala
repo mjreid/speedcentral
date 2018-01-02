@@ -5,6 +5,7 @@ case class LmpAnalysisResult(
   map: Option[Int],
   skillLevel: Option[Int],
   engineVersion: Option[String],
-  iwad: Option[String],
-  pwads: Seq[String]
+  iwad: String,
+  primaryPwad: Option[Pwad],
+  secondaryPwads: Seq[Pwad]
 )

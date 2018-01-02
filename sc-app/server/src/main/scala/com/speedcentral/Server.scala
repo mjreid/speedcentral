@@ -11,6 +11,7 @@ import com.speedcentral.configuration.{CorsSupport, FeedRouter, MetadataRouter, 
 import com.speedcentral.controllers.{FeedController, LmpController, SearchController}
 import com.speedcentral.db.Repository
 import com.speedcentral.hm.HmClient
+import com.speedcentral.lmp.{LmpAnalyzer, PwadAnalyzer}
 import com.speedcentral.routes.DemoRouter
 import com.typesafe.config.{Config, ConfigFactory}
 
@@ -54,8 +55,11 @@ object Server
     val hmApiKey = config.getString("hm.api-key")
     val hmClient = new HmClient(hmUrl, hmApiKey)
 
+    val pwadAnalyzer = new PwadAnalyzer(config.getString("idgames.url"))
+    val lmpAnalyzer = new LmpAnalyzer(pwadAnalyzer)
+
     val repository = new Repository(executionContexts.slowExecutionContext)
-    val lmpController = new LmpController(repository, hmClient)
+    val lmpController = new LmpController(repository, hmClient, lmpAnalyzer)
 
     val demoRouter = new DemoRouter(lmpController, executionContexts.fastExecutionContext)
     val demoRoutes = demoRouter.buildRoutes()

@@ -11,16 +11,14 @@ import scala.util.Success
 
 class LmpController(
   repository: Repository,
-  hmClient: HmClient
+  hmClient: HmClient,
+  lmpAnalyzer: LmpAnalyzer
 ) {
 
-  val lmpAnalyzer = new LmpAnalyzer
   val apiConverter = new ApiConverter
 
   def analyzeLmp(lmp: Array[Byte])(implicit ec: ExecutionContext): Future[LmpAnalysisResult] = {
-    Future {
-      lmpAnalyzer.analyze(lmp).get
-    }
+    lmpAnalyzer.analyze(lmp)
   }
 
   def createNewRun(createRunRequest: CreateRunRequest)(implicit ec: ExecutionContext): Future[CreateRunResult] = {

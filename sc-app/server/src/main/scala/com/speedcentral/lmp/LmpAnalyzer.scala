@@ -5,43 +5,57 @@ import java.nio.charset.StandardCharsets
 import com.speedcentral.api.LmpAnalysisResult
 
 import scala.collection.mutable
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 class LmpAnalyzer(
-
+  pwadAnalyzer: PwadAnalyzer
 ) {
 
   private val iwadParameter = "-iwad"
   private val pwadParameter = "-file"
   private val wadSuffix = ".wad"
 
-  def analyze(lmp: Array[Byte]): Try[LmpAnalysisResult] = {
-    Try {
-      if (lmp(0) == LmpConstants.EngineVersion.doom_19) {
-        val skillLevel = lmp(1).toInt
-        val episode = lmp(2).toInt
-        val map = lmp(3).toInt
+  def analyze(lmp: Array[Byte])(implicit ec: ExecutionContext): Future[LmpAnalysisResult] = {
+    if (lmp(0) == LmpConstants.EngineVersion.doom_19) {
+      val skillLevel = lmp(1).toInt
+      val episode = lmp(2).toInt
+      val map = lmp(3).toInt
 
-        val endOfDemoIndex = lmp.indexOf(LmpConstants.EndOfDemoMarker)
-        if (endOfDemoIndex == -1) throw InvalidLmpException(s"Did not find end of demo marker; corrupt lmp file?")
-        val demoFooterBytes = lmp.slice(endOfDemoIndex + 1, lmp.length)
-        val demoFooterString = new String(demoFooterBytes, StandardCharsets.US_ASCII).toLowerCase
+      val endOfDemoIndex = lmp.indexOf(LmpConstants.EndOfDemoMarker)
+      if (endOfDemoIndex == -1) throw InvalidLmpException(s"Did not find end of demo marker; corrupt lmp file?")
+      val demoFooterBytes = lmp.slice(endOfDemoIndex + 1, lmp.length)
+      val demoFooterString = new String(demoFooterBytes, StandardCharsets.US_ASCII).toLowerCase
 
-        val iwad = findIwad(demoFooterString)
-        val pwads = findPwads(demoFooterString)
-        val engine = getEngine(demoFooterString)
+      val iwad = findIwad(demoFooterString).getOrElse("doom2")
+      val pwads = findPwads(demoFooterString)
+      val engine = getEngine(demoFooterString)
+
+      val resolvedPwads = pwads.map { pwad =>
+        pwadAnalyzer.resolvePwadPath(pwad, iwad)
+      }
+
+      val sequenced = Future.sequence(resolvedPwads)
+      sequenced.map { resolvedPwads =>
+        val flattened = resolvedPwads.flatten
+        val pwads = flattened.toList match {
+          case Nil => (None, Seq.empty)
+          case head :: Nil => (Some(head), Seq.empty)
+          case head :: tail => (Some(head), tail)
+        }
 
         LmpAnalysisResult(
-          skillLevel = Some(skillLevel),
-          map = Some(map),
           episode = Some(episode),
+          map = Some(map),
+          skillLevel = Some(skillLevel),
           engineVersion = engine,
           iwad = iwad,
-          pwads = pwads
+          primaryPwad = pwads._1,
+          secondaryPwads = pwads._2
         )
-      } else {
-        throw InvalidLmpException(s"Unsupported engine version ${lmp(0)}")
       }
+    } else {
+      Future.failed(InvalidLmpException(s"Unsupported engine version ${lmp(0)}"))
     }
   }
 
