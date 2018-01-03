@@ -28,7 +28,6 @@ export default class LmpPrimaryPwadSelector extends Component {
     this.props.onLmpDataChanged({
       primaryPwad: updatedPwad
     });
-    this.props.onLmpDataChanged(updatedPwad);
   }
 
   handleUrlChange(e) {
@@ -37,7 +36,6 @@ export default class LmpPrimaryPwadSelector extends Component {
     this.props.onLmpDataChanged({
       primaryPwad: updatedPwad
     });
-    this.props.onLmpDataChanged(updatedPwad);
   }
 
   resolvePwad(e) {
@@ -52,8 +50,8 @@ export default class LmpPrimaryPwadSelector extends Component {
     }
     return (
       <FormGroup bsSize="sm" controlId="primaryPwadSelector" className="LmpUploadControl BgTwo">
-        <Col sm={2}>
-          Primary PWAD
+        <Col sm={2} componentClass={ControlLabel} >
+          PWAD
         </Col>
         <Col sm={3}>
           <FormControl type="text" value={this.props.pwad.pwadFilename} onBlur={this.resolvePwad} onChange={this.handleFilenameChange} />

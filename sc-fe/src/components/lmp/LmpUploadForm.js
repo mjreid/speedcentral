@@ -5,6 +5,7 @@ import LmpIwadSelector from "./LmpIwadSelector";
 import LmpMapSelector from "./LmpMapSelector";
 import LmpCategorySelector from "./LmpCategorySelector";
 import LmpPrimaryPwadSelector from "./LmpPrimaryPwadSelector";
+import LmpResourcePwadSelector from "./LmpResourcePwadSelector";
 
 export default class LmpUploadForm extends Component {
 
@@ -54,6 +55,7 @@ export default class LmpUploadForm extends Component {
         <LmpMapSelector iwad={lmpData.iwad} onLmpDataChanged={onLmpDataChanged} episode={lmpData.episode} map={lmpData.map} />
         <LmpCategorySelector category={lmpData.category} onLmpDataChanged={onLmpDataChanged} />
         <LmpPrimaryPwadSelector pwadResolveRequest={pwadResolveRequest} onLmpDataChanged={onLmpDataChanged} iwad={lmpData.iwad} pwad={lmpData.primaryPwad} />
+        <LmpResourcePwadSelector pwads={lmpData.secondaryPwads} onLmpDataChanged={onLmpDataChanged} iwad={lmpData.iwad} pwadResolveRequest={pwadResolveRequest} />
         <Row className="BgOne">
           <Col xs={8} />
           <Col xs={4}>

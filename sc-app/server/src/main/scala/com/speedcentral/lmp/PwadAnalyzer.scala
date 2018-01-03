@@ -78,7 +78,8 @@ class PwadAnalyzer(
     "valiant" -> "valiant.zip"
   )
 
-  def resolvePwadPath(pwadName: String, iwad: String): Future[Option[ApiPwad]] = {
+  def resolvePwadPath(pwadNameUnsanitized: String, iwad: String): Future[Option[ApiPwad]] = {
+    val pwadName = pwadNameUnsanitized.toLowerCase
     // If the pwad already contains a '/' character we'll assume it's a full path already.
     if (pwadName.contains("/")) {
       Future.successful(Some(ApiPwad(pwadName, pwadName)))
