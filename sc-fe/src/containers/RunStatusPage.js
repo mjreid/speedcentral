@@ -22,7 +22,7 @@ class RunStatusPage extends Component {
 
   componentWillUnmount() {
     if (this.interval) {
-      this.clearInterval(this.interval);
+      clearInterval(this.interval);
     }
   }
 

@@ -49,9 +49,10 @@ export function pwadResolveFailure(error) {
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
     case LMP_ANALYZE_SUCCESS:
+      const response = fixMissingPrimaryPwad(action.response);
       return {
         ...state,
-        analysisResult: Object.assign({}, action.response, { lmp: action.lmp })
+        analysisResult: Object.assign({}, response, { lmp: action.lmp })
       };
     case LMP_ANALYZE_FAILURE:
       return {
@@ -97,7 +98,12 @@ export default function reducer(state = initialState, action = {}) {
   }
 }
 
-
+function fixMissingPrimaryPwad(lmpData) {
+  if (!lmpData.primaryPwad) {
+    return Object.assign({}, lmpData, { primaryPwad: { pwadFilename: "", pwadIdgamesLocation: "" } });
+  }
+  return lmpData;
+}
 
 
 function* analyzeLmp(lmpAnalyzeRequest) {

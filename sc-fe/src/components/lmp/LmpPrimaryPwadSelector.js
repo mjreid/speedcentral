@@ -45,19 +45,19 @@ export default class LmpPrimaryPwadSelector extends Component {
   }
 
   render() {
-    if (!this.props.pwad) {
-      return (<div />);
-    }
+
+    const { pwadFilename, pwadIdgamesLocation } = this.props.pwad;
+
     return (
       <FormGroup bsSize="sm" controlId="primaryPwadSelector" className="LmpUploadControl BgTwo">
         <Col sm={2} componentClass={ControlLabel} >
           PWAD
         </Col>
         <Col sm={3}>
-          <FormControl type="text" value={this.props.pwad.pwadFilename} onBlur={this.resolvePwad} onChange={this.handleFilenameChange} />
+          <FormControl type="text" value={pwadFilename} onBlur={this.resolvePwad} onChange={this.handleFilenameChange} />
         </Col>
         <Col sm={7}>
-          <FormControl type="text" value={this.props.pwad.pwadIdgamesLocation} onChange={this.handleUrlChange} />
+          <FormControl type="text" value={pwadIdgamesLocation} onChange={this.handleUrlChange} />
         </Col>
       </FormGroup>
     )

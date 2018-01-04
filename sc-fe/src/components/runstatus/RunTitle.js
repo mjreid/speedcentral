@@ -6,8 +6,8 @@ export default class RunTitle extends Component {
 
   static propTypes = {
     iwad: PropTypes.string,
-    episode: PropTypes.number,
-    map: PropTypes.number,
+    episode: PropTypes.string,
+    map: PropTypes.string,
     runTime: PropTypes.string,
     runner: PropTypes.string,
     category: PropTypes.string,

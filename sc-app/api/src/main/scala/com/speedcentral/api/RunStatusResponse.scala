@@ -6,9 +6,9 @@ case class RunStatusResponse(
 
 case class ApiRun(
   runId: String,
-  map: Int,
-  episode: Int,
-  skillLevel: Int,
+  map: String,
+  episode: String,
+  skillLevel: String,
   iwad: String,
   engineVersion: String,
   runner: Option[String],

@@ -27,7 +27,10 @@ class LmpController(
   }
 
   def createNewRun(createRunRequest: CreateRunRequest)(implicit ec: ExecutionContext): Future[CreateRunResult] = {
-    repository.createRun(createRunRequest).map { createdRun =>
+    val validated = validateRunRequest(createRunRequest)
+    Future {
+      repository.createRun(validated)
+    }.map { createdRun =>
       CreateRunResult(runId = createdRun.id.toString)
     }.andThen {
       case Success(result) =>
@@ -39,7 +42,9 @@ class LmpController(
     Future {
       runIdStr.toLong
     }.flatMap { runId =>
-      repository.loadRun(runId).map { maybeRunData =>
+      Future {
+        repository.loadRun(runId)
+      }.map { maybeRunData =>
         maybeRunData.map { case(run, recordings, recordingHistories) =>
           val apiRun = apiConverter.buildRun(run, recordings, recordingHistories)
           RunStatusResponse(apiRun)
@@ -48,5 +53,22 @@ class LmpController(
         }
       }
     }
+  }
+
+  // Do very basic, frameworkless validation on the run request.
+  private def validateRunRequest(request: CreateRunRequest): CreateRunRequest = {
+    // If pwad is None (or has an empty name), turn it into the iwad
+    val pwad = request.primaryPwad match {
+      case p @ Some(ApiPwad(name, _)) if name.trim.nonEmpty => p
+      case _ => Some(ApiPwad(request.iwad, "N/A"))
+    }
+
+    // Include only secondary pwads that have a nonempty filename
+    val secondaryPwads = request.secondaryPwads.filter(p => p.pwadFilename.trim.nonEmpty)
+
+    request.copy(
+      primaryPwad = pwad,
+      secondaryPwads = secondaryPwads
+    )
   }
 }

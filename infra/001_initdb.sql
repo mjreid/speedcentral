@@ -7,9 +7,9 @@ CREATE TABLE pwad (
 
 CREATE TABLE run (
   id BIGSERIAL PRIMARY KEY,
-  map INT NOT NULL,
-  episode INT NOT NULL,
-  skill_level INT NOT NULL,
+  map VARCHAR(10) NOT NULL,
+  episode VARCHAR(10) NOT NULL,
+  skill_level VARCHAR(10) NOT NULL,
   iwad VARCHAR(80) NOT NULL,
   primary_pwad_id BIGINT REFERENCES pwad (id) NOT NULL,
   engine_version VARCHAR(1024) NOT NULL,

@@ -1,16 +1,17 @@
 package com.speedcentral.routes
 
-import com.speedcentral.configuration.ScRouteDefinition
-import com.speedcentral.controllers.LmpController
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
-import akka.util.{ByteString, Timeout}
-import com.speedcentral.api.{CreateRunRequest, ApiPwad}
+import akka.util.ByteString
 import com.speedcentral.api.JsonFormatters._
+import com.speedcentral.api.{ApiPwad, CreateRunRequest}
+import com.speedcentral.configuration.ScRouteDefinition
+import com.speedcentral.controllers.LmpController
 import org.slf4j.LoggerFactory
+import spray.json._
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
@@ -55,10 +56,12 @@ class DemoRouter(
         path("submit") {
           formFields("iwad", "map".as[Int], "lmp".as[ByteString], "skillLevel".as[Int],
             "engineVersion", "episode".as[Int], "runner".?, "submitter".?,
-            "category".?, "runTime".?, "primaryPwad".as[ApiPwad].?, "secondaryPwads".as[Seq[ApiPwad]]) {
+            "category".?, "runTime".?, "primaryPwad".?, "secondaryPwads".?) {
             (iwad, map, lmpByteString, skillLevel, engineVersion,
-              episode, runner, submitter, category, runTime, primaryPwad, secondaryPwads) =>
+              episode, runner, submitter, category, runTime, primaryPwadStr, secondaryPwadsStr) =>
 
+              val primaryPwad = primaryPwadStr.map(_.parseJson.convertTo[ApiPwad])
+              val secondaryPwads = secondaryPwadsStr.map { _.parseJson.convertTo[Seq[ApiPwad]] }.getOrElse(Seq.empty)
 
               val lmp = lmpByteString.toArray[Byte]
               val createRunRequest = CreateRunRequest(

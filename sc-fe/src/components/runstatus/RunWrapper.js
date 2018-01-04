@@ -9,14 +9,14 @@ export default class RunWrapper extends Component {
 
   static propTypes = {
     run: PropTypes.shape({
-      map: PropTypes.number,
+      map: PropTypes.string,
       runCategory: PropTypes.string,
       runTime: PropTypes.string,
       modifiedDate: PropTypes.string,
       runner: PropTypes.string,
       skillLevel: PropTypes.number,
       iwad: PropTypes.string,
-      episode: PropTypes.number,
+      episode: PropTypes.string,
       submitter: PropTypes.string,
       recordings: PropTypes.arrayOf(PropTypes.shape({
         recordingId: PropTypes.string,

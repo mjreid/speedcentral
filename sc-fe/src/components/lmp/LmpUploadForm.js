@@ -39,6 +39,8 @@ export default class LmpUploadForm extends Component {
     formData.append('runner', lmpData.runner);
     formData.append('submitter', lmpData.submitter);
     formData.append('category', lmpData.category);
+    formData.append('primaryPwad', JSON.stringify(lmpData.primaryPwad));
+    formData.append('secondaryPwads', JSON.stringify(lmpData.secondaryPwads));
     // formData.append('runTime', lmpData.runTime);
     // Temporary, since run time is required
     formData.append('runTime', "PT8M22S");

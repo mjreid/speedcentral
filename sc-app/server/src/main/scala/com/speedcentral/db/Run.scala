@@ -6,9 +6,9 @@ import scalikejdbc._
 
 case class Run(
   id: Long,
-  map: Int,
-  episode: Int,
-  skillLevel: Int,
+  map: String,
+  episode: String,
+  skillLevel: String,
   iwad: String,
   primaryPwadId: Long,
   engineVersion: String,
@@ -29,9 +29,9 @@ object Run extends SQLSyntaxSupport[Run] {
   def apply(run: ResultName[Run])(rs: WrappedResultSet): Run = {
     new Run(
       rs.long(run.id),
-      rs.int(run.map),
-      rs.int(run.episode),
-      rs.int(run.skillLevel),
+      rs.string(run.map),
+      rs.string(run.episode),
+      rs.string(run.skillLevel),
       rs.string(run.iwad),
       rs.long(run.primaryPwadId),
       rs.string(run.engineVersion),

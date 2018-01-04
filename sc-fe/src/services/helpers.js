@@ -28,11 +28,16 @@ export function categoryProperName(category) {
 }
 
 export function mapProperName(iwad, map, episode) {
+  // If map is NaN, it's assumed it's something like D2ALL, so just use that
+  if (isNaN(map)) {
+    return map;
+  }
+
   if (iwad === "doom") {
     return `E${episode}M${map}`;
   } else {
     // Add leading zero to single-digit maps
-    if (map < 10) {
+    if (parseInt(map, 10) < 10) {
       return `MAP0${map}`;
     } else {
       return `MAP${map}`;

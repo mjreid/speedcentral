@@ -14,11 +14,11 @@ class LmpUploadPage extends Component {
     submitDemoRequest: PropTypes.func,
     pwadResolveRequest: PropTypes.func,
     analysisResult: PropTypes.shape({
-      map: PropTypes.number,
+      map: PropTypes.string,
       pwads: PropTypes.array,
-      skillLevel: PropTypes.number,
+      skillLevel: PropTypes.string,
       iwad: PropTypes.string,
-      episode: PropTypes.number,
+      episode: PropTypes.string,
       engineVersion: PropTypes.string,
       // The following stuff is *not* determined by the analysis
       runner: PropTypes.string,

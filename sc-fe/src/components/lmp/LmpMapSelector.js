@@ -7,8 +7,8 @@ export default class LmpMapSelector extends Component {
 
   static propTypes = {
     iwad: PropTypes.string,
-    map: PropTypes.number,
-    episode: PropTypes.number,
+    map: PropTypes.string,
+    episode: PropTypes.string,
     onLmpDataChanged: PropTypes.func,
   };
 
