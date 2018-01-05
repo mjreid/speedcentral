@@ -5,5 +5,6 @@ object LmpConstants {
 
   object EngineVersion {
     val doom_19: Byte = 109.toByte
+    val boom: Byte = 202.toByte
   }
 }

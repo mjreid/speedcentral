@@ -13,12 +13,19 @@ export default class RecordingStatusHistory extends Component {
   };
 
   static specificStatuses = {
-    run_received: 'Video recording queued',
+    run_received: 'Recording queued',
     upload_succeeded: 'Video upload complete',
-    exe_recording_started: 'Recording in progress',
-    exe_recording_succeeded: 'Recording complete',
+    exe_recording_started: 'Video recording in progress',
+    exe_recording_succeeded: 'Video recording complete',
     upload_started: 'Video upload in progress',
+    pwad_resolve_started: 'Resolving PWADs',
+    pwad_resolve_succeeded: 'Resolving PWADs succeeded',
+    pwad_download_started: 'Downloading PWAD in progress',
+    pwad_download_succeeded: 'Downloading PWAD succeeded',
+    pwad_download_failed: 'Downloading PWAD failed',
 
+
+    pwad_resolve_failed: 'Failed to resolve PWADs',
     exe_recording_failed: 'Failed to record demo',
     upload_failed: 'Failed to upload video'
   };

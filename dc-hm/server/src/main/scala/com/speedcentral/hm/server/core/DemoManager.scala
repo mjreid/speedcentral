@@ -4,13 +4,15 @@ import java.util.Base64
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import com.speedcentral.hm.server.core.DatabaseManager._
-import com.speedcentral.hm.server.core.RecordingManager.BeginRecording
+import com.speedcentral.hm.server.core.PwadDownloader.ResolvePwads
+import com.speedcentral.hm.server.core.RecordingManager.{BeginRecording, LmpSaveSucceeded, SaveLmpToFile}
 import com.speedcentral.hm.server.core.UploadManager.UploadVideo
 
 class DemoManager(
   databaseManager: ActorRef,
   recordingManager: ActorRef,
-  uploadManager: ActorRef
+  uploadManager: ActorRef,
+  pwadDownloader: ActorRef
 ) extends Actor with ActorLogging {
 
   import DemoManager._
@@ -19,7 +21,12 @@ class DemoManager(
     case StartDemo(recordingId, lmpData) =>
       log.info(s"Received demo request for $recordingId")
       val lmpDataBytes = Base64.getDecoder.decode(lmpData)
-      recordingManager ! BeginRecording(recordingId, lmpDataBytes)
+      recordingManager ! SaveLmpToFile(recordingId, lmpDataBytes)
+
+    case LmpSaveSucceeded(recordingId) =>
+      log.info(s"LMP save succeeded, starting to resolve PWADs.")
+      databaseManager ! LogPwadResolveStarted(recordingId)
+      pwadDownloader ! ResolvePwads(recordingId)
 
     case RecordingStarted(recordingId) =>
       databaseManager ! LogExeRecordingStarted(recordingId)
@@ -47,12 +54,28 @@ class DemoManager(
     case UploadSucceeded(recordingId) =>
       log.info(s"Upload succeeded for $recordingId")
       databaseManager ! LogUploadSucceeded(recordingId)
+
+    case PwadResolveSucceeded(recordingId) =>
+      log.info(s"PWAD resolve succeeded for $recordingId")
+      databaseManager ! LogPwadResolveSucceeded(recordingId)
+      recordingManager ! BeginRecording(recordingId)
+
+    case PwadResolveFailed(recordingId, error) =>
+      log.error(error, s"PWAD resolve failed for $recordingId")
+      val message = s"PWAD resolve failed"
+      databaseManager ! LogPwadResolvedFailed(recordingId, message)
+
+    case m @ LogPwadDownloadSucceeded(_, _, _, _) =>
+      databaseManager forward m
+
+    case m @ LogPwadDownloadFailed(_, _, _, _) =>
+      databaseManager forward m
   }
 }
 
 object DemoManager {
-  def props(databaseManager: ActorRef, recordingManager: ActorRef, uploadManager: ActorRef): Props =
-    Props(new DemoManager(databaseManager, recordingManager, uploadManager))
+  def props(databaseManager: ActorRef, recordingManager: ActorRef, uploadManager: ActorRef, pwadDownloader: ActorRef): Props =
+    Props(new DemoManager(databaseManager, recordingManager, uploadManager, pwadDownloader))
 
   case class StartDemo(recordingId: String, lmpData: String)
 
@@ -65,6 +88,11 @@ object DemoManager {
   case class UploadFailed(recordingId: String, error: String)
 
   case class UploadSucceeded(recordingId: String)
+
+  case class PwadResolveSucceeded(recordingId: String)
+
+  case class PwadResolveFailed(recordingId: String, error: Throwable)
+
 }
 
 

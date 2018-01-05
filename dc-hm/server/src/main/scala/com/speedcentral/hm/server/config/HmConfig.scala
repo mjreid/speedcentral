@@ -15,7 +15,8 @@ case class HmConfig(
   pwadDirectory: Path,
   lmpDirectory: Path,
   vidDirectory: Path,
-  youTubeConfig: YouTubeConfig
+  youTubeConfig: YouTubeConfig,
+  idgamesConfig: IdgamesConfig
 )
 
 object HmConfig {
@@ -65,6 +66,7 @@ object HmConfig {
       PathUtil.validateDirectory(vidDirectory, vidDirectoryFile, checkWritable = true)
 
       val youTubeConfig = YouTubeConfig.fromConfig(config)
+      val idgamesConfig = IdgamesConfig.fromConfig(config)
 
       HmConfig(
         masterApiKey,
@@ -73,7 +75,8 @@ object HmConfig {
         pwadDirectoryFile,
         lmpDirectoryFile,
         vidDirectoryFile,
-        youTubeConfig
+        youTubeConfig,
+        idgamesConfig
       )
     }
   }

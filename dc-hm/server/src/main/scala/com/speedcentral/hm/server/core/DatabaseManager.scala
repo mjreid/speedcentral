@@ -2,6 +2,7 @@ package com.speedcentral.hm.server.core
 
 import akka.actor.{Actor, ActorLogging, Props}
 import com.speedcentral.hm.server.db.Repository
+import com.speedcentral.hm.server.util.DbUtil._
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -58,25 +59,39 @@ class DatabaseManager(
       extractId(recordingId) { id =>
         repository.createRecordingHistory(id, "upload_failed")
       }
-  }
 
-  /**
-    * Helper method that converts string IDs to long IDs, and logs when an ID is not numeric.
-    *
-    * Philosophically this is done to encapsulate ID's numeric-ness at the DB level. But it's kind of a pain in the ass
-    * to deal with.
-    */
-  private def extractId[T](stringId: String)(inner: Long => T): Future[T] = {
-    val resultF = Future {
-      stringId.toLong
-    }.map(inner)
+    case LogPwadDownloadStarted(recordingId, pwadId, pwadUrl) =>
+      extractId(recordingId) { id =>
+        val message = Some(s"Download PWAD $pwadId from $pwadUrl")
+        repository.createRecordingHistory(id, "pwad_download_started", message)
+      }
 
-    resultF.onFailure {
-      case e: NumberFormatException =>
-        log.error(e, s"Invalid conversion: id $stringId was not a long.")
-    }
+    case LogPwadDownloadSucceeded(recordingId, pwadId, pwadUrl, details) =>
+      extractId(recordingId) { id =>
+        val message = Some(s"Download PWAD $pwadId from $pwadUrl SUCCESS: $details")
+        repository.createRecordingHistory(id, "pwad_download_succeeded", message)
+      }
 
-    resultF
+    case LogPwadDownloadFailed(recordingId, pwadId, pwadUrl, errorDetails) =>
+      extractId(recordingId) { id =>
+        val message = Some(s"Download PWAD $pwadId from $pwadUrl FAILED: $errorDetails")
+        repository.createRecordingHistory(id, "pwad_download_failed", message)
+      }
+
+    case LogPwadResolveStarted(recordingId) =>
+      extractId(recordingId) { id =>
+        repository.createRecordingHistory(id, "pwad_resolve_started")
+      }
+
+    case LogPwadResolveSucceeded(recordingId) =>
+      extractId(recordingId) { id =>
+        repository.createRecordingHistory(id, "pwad_resolve_succeeded")
+      }
+
+    case LogPwadResolvedFailed(recordingId, errorDetails) =>
+      extractId(recordingId) { id =>
+        repository.createRecordingHistory(id, "pwad_resolve_failed", Some(errorDetails))
+      }
   }
 }
 
@@ -101,5 +116,17 @@ object DatabaseManager {
   case class LogUploadFailed(recordingId: String, error: String)
 
   case class LogRecordingFailed(recordingId: String)
+
+  case class LogPwadDownloadStarted(recordingId: String, pwadId: Long, pwadUrl: String)
+
+  case class LogPwadDownloadSucceeded(recordingId: String, pwadId: Long, pwadUrl: String, details: String)
+
+  case class LogPwadDownloadFailed(recordingId: String, pwadId: Long, pwadUrl: String, errorDetails: String)
+
+  case class LogPwadResolveStarted(recordingId: String)
+
+  case class LogPwadResolveSucceeded(recordingId: String)
+
+  case class LogPwadResolvedFailed(recordingId: String, errorDetails: String)
 }
 

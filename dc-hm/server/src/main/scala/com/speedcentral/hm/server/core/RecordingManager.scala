@@ -15,12 +15,12 @@ class RecordingManager(
   import context.dispatcher
 
   override def receive: Receive = {
-    case BeginRecording(recordingId, lmp) =>
+    case BeginRecording(recordingId) =>
       val requestor = sender()
       // Run the beginRecording call on the separate EC.
       Future {
         requestor ! RecordingStarted(recordingId)
-        recorder.beginRecording(recordingId, lmp)
+        recorder.beginRecording(recordingId)
       }(recordingExecutionContext).onComplete {
         case Success(recordingResult) =>
           requestor ! RecordingComplete(recordingResult)
@@ -29,6 +29,9 @@ class RecordingManager(
           requestor ! RecordingComplete(RecordingFailure(recordingId, "stdout", "stderr"))
       }
 
+    case SaveLmpToFile(recordingId, lmp) =>
+      recorder.saveLmpDataToFile(recordingId, lmp)
+      sender() ! LmpSaveSucceeded(recordingId)
   }
 }
 
@@ -36,5 +39,9 @@ object RecordingManager {
   def props(recordingExecutionContext: ExecutionContext, recorder: Recorder): Props =
     Props(new RecordingManager(recordingExecutionContext, recorder))
 
-  case class BeginRecording(runId: String, lmp: Array[Byte])
+  case class SaveLmpToFile(recordingId: String, lmp: Array[Byte])
+
+  case class BeginRecording(recordingId: String)
+
+  case class LmpSaveSucceeded(recordingId: String)
 }

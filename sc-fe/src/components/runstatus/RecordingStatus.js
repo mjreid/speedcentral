@@ -23,9 +23,15 @@ export default class RecordingStatus extends Component {
     exe_recording_started: 'In progress',
     exe_recording_succeeded: 'In progress',
     upload_started: 'In progress',
+    pwad_download_started: 'In progress',
+    pwad_download_succeeded: 'In progress',
+    pwad_download_failed: 'In progress', // This is not a terminal state, despite the name; that's pwad_resolve_failed
+    pwad_resolve_started: 'In progress',
+    pwad_resolve_succeeded: 'In progress',
 
     exe_recording_failed: 'Failed',
-    upload_failed: 'Failed'
+    upload_failed: 'Failed',
+    pwad_resolve_failed: 'Failed',
   };
 
   render() {

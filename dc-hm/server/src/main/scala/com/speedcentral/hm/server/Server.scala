@@ -11,6 +11,7 @@ import com.speedcentral.hm.server.config.{HmConfig, YouTubeConfig}
 import com.speedcentral.hm.server.controller.DemoController
 import com.speedcentral.hm.server.core._
 import com.speedcentral.hm.server.db.Repository
+import com.speedcentral.hm.server.idgames.IdgamesClient
 import com.speedcentral.hm.server.routes.{ApiKeyRestrictor, DemoRouter, MetadataRouter}
 import com.speedcentral.hm.server.youtube.YouTubeAuth
 import com.typesafe.config.ConfigFactory
@@ -36,8 +37,11 @@ object Server
     val hmConfig = loadConfig()
     val recordingExecutionContext = ExecutionContext.fromExecutorService(Executors.newSingleThreadExecutor())
     val dbExecutionContext = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(2))
-    val recorder = new Recorder(hmConfig)
     val repository = new Repository(dbExecutionContext)
+
+
+    val recorder = new Recorder(hmConfig, repository)
+
     val databaseManager = system.actorOf(DatabaseManager.props(repository))
     val recordingManager = system.actorOf(RecordingManager.props(recordingExecutionContext, recorder))
 
@@ -47,8 +51,11 @@ object Server
     val uploadExecutionContext = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(4))
     val uploadManager = system.actorOf(UploadManager.props(youTubeWrapper, uploadExecutionContext))
 
+    val idgamesExecutionContext = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(2))
+    val idgamesClient = new IdgamesClient(hmConfig, idgamesExecutionContext)
+    val pwadDownloader = system.actorOf(PwadDownloader.props(idgamesClient, repository, idgamesExecutionContext))
 
-    val demoManager = system.actorOf(DemoManager.props(databaseManager, recordingManager, uploadManager))
+    val demoManager = system.actorOf(DemoManager.props(databaseManager, recordingManager, uploadManager, pwadDownloader))
 
     val bindingFuture = Http().bindAndHandle(buildRoutes(demoManager, uploadManager, databaseManager, hmConfig), "localhost", 10666)
 

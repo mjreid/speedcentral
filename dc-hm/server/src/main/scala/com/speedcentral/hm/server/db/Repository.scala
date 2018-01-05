@@ -34,12 +34,12 @@ class Repository(
     }
   }
 
-  def createRecordingHistory(recordingId: Long, state: String): Future[Unit] = {
+  def createRecordingHistory(recordingId: Long, state: String, details: Option[String] = None): Future[Unit] = {
     Future {
       DB localTx { implicit session =>
         val currentTime = Instant.now()
-        sql"""insert into recording_history (recording_id, state, history_time)
-             values (${recordingId}, ${state}, ${currentTime})""".update().apply()
+        sql"""insert into recording_history (recording_id, state, history_time, details)
+             values (${recordingId}, ${state}, ${currentTime}, ${details})""".update().apply()
       }
     }
   }
@@ -50,5 +50,30 @@ class Repository(
         sql"""update recording set video_id = ${videoId} where id = ${recordingId}""".update().apply()
       }
     }
+  }
+
+  def loadPwads(recordingId: Long)(implicit session: DBSession = ReadOnlyAutoSession): Seq[Pwad] = {
+    val (pwad, run, rsp, rec) = (Pwad.syntax("pwad"), Run.syntax("run"), RunSecondaryPwads.syntax("rsp"), Recording.syntax("rec"))
+    // Load run first
+    val maybeRun = withSQL {
+      select.from(Run as run).leftJoin(Recording as rec).on(run.id, rec.runId).where.eq(rec.id, recordingId)
+    }.map(Run(run)).first().apply()
+    val loadedRun = maybeRun.getOrElse(throw HmDbException(s"Couldn't find run ${run.id}"))
+
+    // Load primary PWAD
+    val maybePrimaryPwad = withSQL {
+      select.from(Pwad as pwad).where.eq(pwad.id, loadedRun.primaryPwadId)
+    }.map(Pwad(pwad)).first().apply
+    val primaryPwad = maybePrimaryPwad.getOrElse(throw HmDbException(s"Recording $recordingId didn't have valid primary PWAD id"))
+    // Load secondary pwads
+    val secondaryPwads = withSQL {
+      select.from(RunSecondaryPwads as rsp)
+            .leftJoin(Pwad as pwad).on(rsp.pwadId, pwad.id)
+            .where.eq(rsp.runId, loadedRun.id)
+    }.map(Pwad(pwad)).list().apply
+
+    Seq(primaryPwad) ++ secondaryPwads
+
+    // withSQL { select.from(Pwad as pwad).where.in(pwad.fileName, pwadFilenames) }.map(Pwad(p)).list().apply()
   }
 }
