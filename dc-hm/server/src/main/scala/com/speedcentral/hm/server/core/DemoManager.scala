@@ -65,6 +65,9 @@ class DemoManager(
       val message = s"PWAD resolve failed"
       databaseManager ! LogPwadResolvedFailed(recordingId, message)
 
+    case m @ LogPwadDownloadStarted(_, _, _) =>
+      databaseManager forward m
+
     case m @ LogPwadDownloadSucceeded(_, _, _, _) =>
       databaseManager forward m
 

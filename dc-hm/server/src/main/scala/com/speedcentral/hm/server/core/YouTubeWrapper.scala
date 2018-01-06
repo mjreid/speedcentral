@@ -6,5 +6,5 @@ import akka.actor.ActorRef
 
 trait YouTubeWrapper {
   def checkYouTube(): Unit
-  def uploadYouTubeVideo(runId: String, videoToUpload: Path, notifyActor: ActorRef): UploadStartedInfo
+  def uploadYouTubeVideo(recordingId: String, videoToUpload: Path, notifyActor: ActorRef): UploadStartedInfo
 }

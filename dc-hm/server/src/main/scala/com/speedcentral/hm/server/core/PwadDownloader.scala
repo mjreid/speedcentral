@@ -5,7 +5,7 @@ import com.speedcentral.hm.server.core.DatabaseManager.{LogPwadDownloadFailed, L
 import com.speedcentral.hm.server.core.DemoManager.{PwadResolveFailed, PwadResolveSucceeded}
 import com.speedcentral.hm.server.core.PwadDownloader.ResolvePwads
 import com.speedcentral.hm.server.db.Repository
-import com.speedcentral.hm.server.idgames.{DownloadSucceeded, FileExisted, IdgamesClient}
+import com.speedcentral.hm.server.idgames.{DownloadSucceeded, FileExisted, IdgamesClient, PwadWasIwad}
 import com.speedcentral.hm.server.util.DbUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,6 +31,8 @@ class PwadDownloader(
           val downloadF = idgamesClient.resolvePwad(p)
 
           downloadF.onComplete {
+            case Success(PwadWasIwad) =>
+              requestor ! LogPwadDownloadSucceeded(recordingId, p.id, p.idgamesUrl, "IWAD-only")
             case Success(FileExisted) =>
               requestor ! LogPwadDownloadSucceeded(recordingId, p.id, p.idgamesUrl, "PWAD already existed")
             case Success(DownloadSucceeded(bytes, time)) =>

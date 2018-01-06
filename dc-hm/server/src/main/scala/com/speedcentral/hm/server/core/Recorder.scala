@@ -22,7 +22,7 @@ class Recorder(
       RecordingFailure(recordingId, "stdout", "stderr")
     } else {
       val pwads = repository.loadPwads(recordingId.toLong)
-      val pwadsToInclude = pwads.map { p =>
+      val pwadsToInclude = pwads.filter(_.idgamesUrl.toLowerCase != "iwad").map { p =>
         p.localPath(hmConfig.pwadDirectory)
       }
 

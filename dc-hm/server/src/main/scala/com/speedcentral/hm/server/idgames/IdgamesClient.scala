@@ -26,22 +26,26 @@ class IdgamesClient(
 
   def resolvePwad(pwad: Pwad): Future[PwadResolveResult] = {
     logger.info(s"Resolving pwad $pwad...")
-    val destination = buildDestinationPath(pwad).resolve(pwad.fileName)
-
-    if (Files.exists(destination)) {
-      logger.info(s"File ${destination.toString} already existed")
-      Future.successful(FileExisted)
+    if (pwad.idgamesUrl == "iwad") {
+      Future.successful(PwadWasIwad)
     } else {
-      val uri = Uri(s"${hmConfig.idgamesConfig.idgamesBaseUrl}${pwad.idgamesUrl}")
 
-      logger.info(s"Downloading from ${uri.toString()} to ${destination.toString}")
-      val startTime = System.nanoTime()
-      downloadPwad(uri, destination).map { result =>
-        val unzipPath = destination
-        unzipWad(unzipPath)
-        val downloadTime = (System.nanoTime() - startTime) / 1000000d
-        logger.info(s"Download of ${pwad.fileName} from ${uri.toString()} to ${destination.toString} succeeded in ${downloadTime}ms")
-        DownloadSucceeded(result, downloadTime)
+      val destination = buildDestinationPath(pwad).resolve(pwad.fileName)
+      if (Files.exists(destination)) {
+        logger.info(s"File ${destination.toString} already existed")
+        Future.successful(FileExisted)
+      } else {
+        val uri = Uri(s"${hmConfig.idgamesConfig.idgamesBaseUrl}${pwad.idgamesUrl}")
+
+        logger.info(s"Downloading from ${uri.toString()} to ${destination.toString}")
+        val startTime = System.nanoTime()
+        downloadPwad(uri, destination).map { result =>
+          val unzipPath = destination
+          unzipWad(unzipPath)
+          val downloadTime = (System.nanoTime() - startTime) / 1000000d
+          logger.info(s"Download of ${pwad.fileName} from ${uri.toString()} to ${destination.toString} succeeded in ${downloadTime}ms")
+          DownloadSucceeded(result, downloadTime)
+        }
       }
     }
   }
@@ -76,4 +80,5 @@ class IdgamesClient(
 
 sealed trait PwadResolveResult
 case object FileExisted extends PwadResolveResult
+case object PwadWasIwad extends PwadResolveResult
 case class DownloadSucceeded(bytes: Long, timeMs: Double) extends PwadResolveResult
