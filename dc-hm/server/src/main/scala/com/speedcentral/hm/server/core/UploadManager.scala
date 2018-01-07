@@ -30,9 +30,8 @@ class UploadManager(
 
     case UploadVideo(recordingId, videoToUpload) =>
       val notifyActor = sender()
-      Future {
-        youTubeWrapper.uploadYouTubeVideo(recordingId, videoToUpload, notifyActor)
-      }(uploadExecutionContext).onComplete {
+      notifyActor ! UploadStarted(recordingId)
+      youTubeWrapper.uploadYouTubeVideo(recordingId, videoToUpload, notifyActor)(uploadExecutionContext).onComplete {
         case Success(videoId) =>
           notifyActor ! UploadSucceeded(recordingId, videoId)
         case Failure(e) =>

@@ -76,4 +76,13 @@ class Repository(
 
     // withSQL { select.from(Pwad as pwad).where.in(pwad.fileName, pwadFilenames) }.map(Pwad(p)).list().apply()
   }
+
+  def loadRunOfRecording(recordingId: Long)(implicit session: DBSession = ReadOnlyAutoSession): Future[Option[Run]] = {
+    Future {
+      val (run, rec) = (Run.syntax("run"), Recording.syntax("rec"))
+      withSQL {
+        select.from(Run as run).leftJoin(Recording as rec).on(run.id, rec.runId).where.eq(rec.id, recordingId)
+      }.map(Run(run)).first().apply()
+    }
+  }
 }

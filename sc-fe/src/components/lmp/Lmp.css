@@ -9,3 +9,7 @@
     margin: 0;
     overflow: auto;
 }
+.Error {
+    color: #DDDDDD;
+    background-color: #333333;
+}

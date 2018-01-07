@@ -24,4 +24,20 @@ object DbUtil {
 
     resultF
   }
+
+  /**
+    * Same as above, but with flatmap rather than map
+    */
+  def extractIdFlat[T](stringId: String)(inner: Long => Future[T])(implicit ec: ExecutionContext): Future[T] = {
+    val resultF = Future {
+      stringId.toLong
+    }.flatMap(inner)
+
+    resultF.onFailure {
+      case e: NumberFormatException =>
+        log.error(s"Invalid conversion: id $stringId was not a long.", e)
+    }
+
+    resultF
+  }
 }

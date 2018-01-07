@@ -11,14 +11,18 @@ import com.google.api.services.youtube.YouTube
 import com.google.api.services.youtube.model.{Video, VideoSnippet, VideoStatus}
 import com.speedcentral.hm.server.config.YouTubeConfig
 import com.speedcentral.hm.server.core.DemoManager.UploadSucceeded
+import com.speedcentral.hm.server.db.{HmDbException, Pwad, Repository, Run}
+import com.speedcentral.hm.server.util.{DbUtil, VideoTitleUtil}
 import com.speedcentral.hm.server.youtube.YouTubeAuth
 import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
+import scala.concurrent.{ExecutionContext, Future}
 
 class YouTubeWrapperImpl(
   youTubeConfig: YouTubeConfig,
-  auth: YouTubeAuth
+  auth: YouTubeAuth,
+  repository: Repository
 ) extends YouTubeWrapper {
 
   private val log = LoggerFactory.getLogger(classOf[YouTubeWrapperImpl])
@@ -35,17 +39,30 @@ class YouTubeWrapperImpl(
     log.info(s"YouTube request result: ${response.toPrettyString}")
   }
 
-  def uploadYouTubeVideo(recordingId: String, videoToUpload: Path, notifyActor: ActorRef): String = {
+  def uploadYouTubeVideo(recordingId: String, videoToUpload: Path, notifyActor: ActorRef)(implicit ec: ExecutionContext): Future[String] = {
+    DbUtil.extractIdFlat(recordingId) { id =>
+      for {
+        maybeRun <- repository.loadRunOfRecording(id)
+        run = maybeRun.getOrElse(throw HmDbException(s"Run for $recordingId not found?"))
+        pwads = repository.loadPwads(id)
+        primaryPwad = pwads.find(p => p.id == run.primaryPwadId).getOrElse(throw HmDbException(s"No primary PWAD for recording $recordingId?"))
+      } yield uploadVideoInternal(recordingId, videoToUpload, notifyActor, run, primaryPwad)
+    }
+  }
+
+  private def uploadVideoInternal(recordingId: String, videoToUpload: Path, notifyActor: ActorRef, run: Run, primaryPwad: Pwad): String = {
     log.info(s"Building YouTube metadata for $recordingId")
+    val title = VideoTitleUtil.buildVideoTitle(run, primaryPwad)
+
     val metadata = new Video()
     val videoStatus = new VideoStatus()
     videoStatus.setPrivacyStatus("unlisted")
     metadata.setStatus(videoStatus)
 
     val snippet = new VideoSnippet()
-    snippet.setTitle(s"Doom LMPs Uploader Test - ${LocalDateTime.now().toString}")
-    snippet.setDescription(s"Testing LMP uploader (from local dev box) on ${LocalDateTime.now().toString}")
-    snippet.setTags(Seq("doom").asJava)
+    snippet.setTitle(title)
+    snippet.setDescription(s"$title. Uploaded by Doom LMP Uploader")
+    snippet.setTags(Seq("doom", "speedrun").asJava)
 
     metadata.setSnippet(snippet)
 

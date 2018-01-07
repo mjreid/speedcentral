@@ -27,7 +27,9 @@ class LmpAnalyzer(
       val demoFooterBytes = lmp.slice(endOfDemoIndex + 1, lmp.length)
       val demoFooterString = new String(demoFooterBytes, StandardCharsets.US_ASCII).toLowerCase
 
-      val iwad = findIwad(demoFooterString).getOrElse("doom2")
+      val iwad = findIwad(demoFooterString).getOrElse {
+        if (episode > 1) "doom" else "doom2"
+      }
       val pwads = findPwads(demoFooterString)
       val engine = getEngine(demoFooterString)
 

@@ -94,7 +94,7 @@ export default class LmpUploadForm extends Component {
                          groupClass={this.controlBackground()} labelSize={2} inputSize={10}
           />
         <LmpMapSelector iwad={lmpData.iwad} onLmpDataChanged={onLmpDataChanged} episode={lmpData.episode} map={lmpData.map}
-                        groupClass={this.controlBackground()} mapLabelSize={2} mapInputSize={10} episodeLabelSize={1} episodeInputSize={3}
+                        groupClass={this.controlBackground()} mapLabelSize={2} mapInputSize={10} episodeLabelSize={2} episodeInputSize={3}
         />
         <LmpCategorySelector category={lmpData.category} onLmpDataChanged={onLmpDataChanged}
                              groupClass={this.controlBackground()} labelSize={2} inputSize={10}

@@ -27,6 +27,18 @@ object Run extends SQLSyntaxSupport[Run] {
 
   def apply(r: SyntaxProvider[Run])(rs: WrappedResultSet): Run = apply(r.resultName)(rs)
   def apply(run: ResultName[Run])(rs: WrappedResultSet): Run = {
+    val runTimeMs = rs.longOpt(run.runTime)
+    val runTime = runTimeMs.map { ms =>
+      val secondsTotal = ms / 1000
+      val hours = secondsTotal / 3600
+      val minutes = (secondsTotal % 3600) / 60
+      val seconds = secondsTotal % 60
+      if (hours == 0) {
+        "%02d:%02d".format(minutes, seconds)
+      } else {
+        "%02d:%02d:%02d".format(hours, minutes, seconds)
+      }
+    }
     new Run(
       rs.long(run.id),
       rs.string(run.map),
@@ -38,7 +50,7 @@ object Run extends SQLSyntaxSupport[Run] {
       rs.stringOpt(run.runner),
       rs.stringOpt(run.submitter),
       rs.stringOpt(run.runCategory),
-      rs.stringOpt(run.runTime),
+      runTime,
       rs.timestamp(run.createdDate).toInstant,
       rs.timestamp(run.modifiedDate).toInstant
     )

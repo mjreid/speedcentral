@@ -5,6 +5,7 @@ import {lmpAnalyzeDataChanged, lmpAnalyzeRequest, pwadResolveRequest, pwadResolv
 import LmpUploadForm from "../components/lmp/LmpUploadForm";
 import LmpFileSelector from "../components/lmp/LmpFileSelector";
 import {demoSubmitRequest} from "../modules/demosubmit";
+import LmpErrorMessage from "../components/lmp/LmpErrorMessage";
 
 class LmpUploadPage extends Component {
 
@@ -33,7 +34,8 @@ class LmpUploadPage extends Component {
         pwadFilename: PropTypes.string,
         pwadIdgamesLocation: PropTypes.string
       })),
-    })
+    }),
+    errorMessage: PropTypes.string,
   };
 
   static defaultProps = {
@@ -46,7 +48,14 @@ class LmpUploadPage extends Component {
     const lmpFileSelector = (
       <LmpFileSelector lmpAnalyzeRequest={lmpAnalyzeRequest} />
     );
-    if (Object.keys(analysisResult).length === 0) {
+    if (this.props.errorMessage) {
+      return (
+        <div>
+          {lmpFileSelector}
+          <LmpErrorMessage errorMessage={this.props.errorMessage} />
+        </div>
+      );
+    } else if (Object.keys(analysisResult).length === 0) {
       return lmpFileSelector;
     } else {
       return (
@@ -65,7 +74,8 @@ class LmpUploadPage extends Component {
 
 function mapStateToProps(state) {
   return {
-    analysisResult: state.lmpAnalysis.analysisResult
+    analysisResult: state.lmpAnalysis.analysisResult,
+    errorMessage: state.lmpAnalysis.errorMessage,
   };
 }
 

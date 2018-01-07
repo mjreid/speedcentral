@@ -31,7 +31,7 @@ export default class LmpFileSelector extends Component {
     return (
       <FormGroup controlId="lmpFileSelector" className="LmpUploadControl BgOne">
         <Col componentClass={ControlLabel} sm={2}>
-          Select LMP
+          Upload
         </Col>
         <Col sm={10}>
           <FormControl id="lmpFileSelector" type="file" onChange={this.onChange} />

@@ -9,7 +9,7 @@ export function generateRunTitle(
 ) {
   const dIwad = iwadProperName(iwad);
   const dCategory = categoryProperName(category);
-  const dMap= mapProperName(iwad, map, episode);
+  const dMap = mapProperName(iwad, map, episode);
 
   let pwadDisplay = "";
   if (pwad) {

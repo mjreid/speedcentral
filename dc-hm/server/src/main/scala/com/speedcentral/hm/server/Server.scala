@@ -47,7 +47,7 @@ object Server
 
 
     val youTubeAuth = new YouTubeAuth(hmConfig.youTubeConfig)
-    val youTubeWrapper = buildYouTubeWrapper(hmConfig.youTubeConfig, youTubeAuth)
+    val youTubeWrapper = buildYouTubeWrapper(hmConfig.youTubeConfig, youTubeAuth, repository)
     val uploadExecutionContext = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(4))
     val uploadManager = system.actorOf(UploadManager.props(youTubeWrapper, uploadExecutionContext))
 
@@ -65,13 +65,13 @@ object Server
     })
   }
 
-  private def buildYouTubeWrapper(youTubeConfig: YouTubeConfig, youTubeAuth: YouTubeAuth): YouTubeWrapper = {
+  private def buildYouTubeWrapper(youTubeConfig: YouTubeConfig, youTubeAuth: YouTubeAuth, repository: Repository): YouTubeWrapper = {
     if (youTubeConfig.enabled) {
       logger.info("YouTube ENABLED.")
-      new YouTubeWrapperImpl(youTubeConfig, youTubeAuth)
+      new YouTubeWrapperImpl(youTubeConfig, youTubeAuth, repository)
     } else {
       logger.info("YouTube DISABLED, using stub implementation.")
-      new YouTubeWrapperStub
+      new YouTubeWrapperStub(repository)
     }
   }
 

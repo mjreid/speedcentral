@@ -4,6 +4,10 @@ import './Layout.css'
 
 export default class LayoutHeader extends Component {
   render() {
-   return (<div className="LayoutHeader" />);
+   return (
+     <div className="LayoutHeader">
+       Doom LMP Uploader
+     </div>
+   );
   }
 }

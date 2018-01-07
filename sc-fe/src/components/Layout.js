@@ -1,30 +1,29 @@
 import React, {Component} from "react";
 import {Grid, Row, Col} from 'react-bootstrap';
-import {LinkContainer} from "react-router-bootstrap";
-import Button from "react-bootstrap/es/Button";
 import LayoutHeader from "./LayoutHeader";
+import "./Layout.css";
 
 export class Layout extends Component {
 
   render() {
     return (
-      <Grid>
-        <Row className="show-grid">
+      <Grid className="LayoutContainer">
+        <Row className="LayoutContainerHeader">
           <Col xs={12}>
             <LayoutHeader />
           </Col>
         </Row>
-        <Row className="showGrid">
+        <Row className="LayoutContainerContent">
           <Col xs={1} md={1} lg={1}>
             <div>
             </div>
           </Col>
-          <Col xs={10} md={8} lg={6}>
+          <Col xs={10} md={8}>
             <div>
               {this.props.children}
             </div>
           </Col>
-          <Col xs={1} md={3} lg={5}>
+          <Col xs={1} md={3}>
             <div>
             </div>
           </Col>

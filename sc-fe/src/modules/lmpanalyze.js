@@ -12,10 +12,11 @@ const LMP_ANALYZE_DATA_CHANGED = 'sc-fe/impanalyze/CHANGED';
 const PWAD_RESOLVE_REQUEST = 'sc-fe/pwadresolve/REQUEST';
 const PWAD_RESOLVE_SUCCESS = 'sc-fe/pwadresolve/SUCCESS';
 const PWAD_RESOLVE_FAILURE = 'sc-fe/pwadresolve/FAILURE';
-
+const INVALID_DEMO_FORMAT = 'Could not analyze the LMP. Currently supported formats are Doom (2), Boom, and PRBoom.';
 
 const initialState = {
-  analysisResult: {}
+  analysisResult: {},
+  errorMessage: undefined
 };
 
 export function lmpAnalyzeRequest(lmp) {
@@ -52,12 +53,13 @@ export default function reducer(state = initialState, action = {}) {
       const response = fixMissingPrimaryPwad(action.response);
       return {
         ...state,
-        analysisResult: Object.assign({}, response, { lmp: action.lmp, category: "uv-max" })
+        analysisResult: Object.assign({}, response, { lmp: action.lmp, category: "uv-max" }),
+        errorMessage: undefined
       };
     case LMP_ANALYZE_FAILURE:
       return {
         ...state,
-        analysisResult: { lmp: action.lmp },
+        analysisResult: {},
         errorMessage: action.error
       };
     case LMP_ANALYZE_DATA_CHANGED:
@@ -111,7 +113,7 @@ function* analyzeLmp(lmpAnalyzeRequest) {
     const analysisResults = yield call(api.analyzeLmp, lmpAnalyzeRequest.lmp);
     yield put(lmpAnalyzeSuccess(lmpAnalyzeRequest.lmp, analysisResults));
   } catch(error) {
-    yield put(lmpAnalyzeFailure(lmpAnalyzeRequest.lmp, SERVER_FAILED));
+    yield put(lmpAnalyzeFailure(lmpAnalyzeRequest.lmp, INVALID_DEMO_FORMAT));
   }
 }
 

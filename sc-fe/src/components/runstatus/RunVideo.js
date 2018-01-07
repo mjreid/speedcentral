@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import "./Run.css";
 
 export default class RunVideo extends Component {
 
@@ -13,7 +14,19 @@ export default class RunVideo extends Component {
   render() {
     const { recordings } = this.props;
 
-    const noVideo = (<div style="width: 420px; max-width: 420px; height: 315px; max-height: 315px;" />);
+    const noVideo = (
+      <div className={this.props.className}>
+        <div className="EmptyVideo">
+          <div className="spinner">
+            <div className="rect1" />
+            <div className="rect2" />
+            <div className="rect3" />
+            <div className="rect4" />
+            <div className="rect5" />
+          </div>
+        </div>
+      </div>
+    );
 
 
     if (recordings.length > 0) {
