@@ -43,17 +43,17 @@ class DemoManager(
           uploadManager ! UploadVideo(recordingId, outputVideo)
       }
 
-    case UploadStarted(info) =>
-      log.info(s"Upload started: $info")
-      databaseManager ! LogUploadStarted(info.recordingId, info.videoId)
+    case UploadStarted(recordingId) =>
+      log.info(s"Upload started: $recordingId")
+      databaseManager ! LogUploadStarted(recordingId)
 
     case UploadFailed(recordingId, error) =>
       log.info(s"Upload failed: $error")
       databaseManager ! LogUploadFailed(recordingId, error)
 
-    case UploadSucceeded(recordingId) =>
-      log.info(s"Upload succeeded for $recordingId")
-      databaseManager ! LogUploadSucceeded(recordingId)
+    case UploadSucceeded(recordingId, videoId) =>
+      log.info(s"Upload succeeded for $recordingId, videoId is $videoId")
+      databaseManager ! LogUploadSucceeded(recordingId, videoId)
 
     case PwadResolveSucceeded(recordingId) =>
       log.info(s"PWAD resolve succeeded for $recordingId")
@@ -86,11 +86,11 @@ object DemoManager {
 
   case class RecordingComplete(recordingResult: RecordingResult)
 
-  case class UploadStarted(info: UploadStartedInfo)
+  case class UploadStarted(recordingId: String)
 
   case class UploadFailed(recordingId: String, error: String)
 
-  case class UploadSucceeded(recordingId: String)
+  case class UploadSucceeded(recordingId: String, videoId: String)
 
   case class PwadResolveSucceeded(recordingId: String)
 

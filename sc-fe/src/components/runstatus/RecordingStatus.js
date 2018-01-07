@@ -46,7 +46,7 @@ export default class RecordingStatus extends Component {
         return (
           <div>
             <div>
-              Recording status: {RecordingStatus.overallStatuses[recording.history[0]]}
+              Recording status: {RecordingStatus.overallStatuses[recording.history[0].state]}
             </div>
             <div>
               {recording.history.map((history) => <RecordingStatusHistory history={history} />)}

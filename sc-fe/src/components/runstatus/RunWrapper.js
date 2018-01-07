@@ -4,6 +4,8 @@ import RunVideo from "./RunVideo";
 import RunTitle from "./RunTitle";
 import RunDetails from "./RunDetails";
 import RecordingStatus from "./RecordingStatus";
+import "./Run.css";
+import {Col, Grid, Row} from "react-bootstrap";
 
 export default class RunWrapper extends Component {
 
@@ -26,16 +28,27 @@ export default class RunWrapper extends Component {
           state: PropTypes.string,
           historyTime: PropTypes.string
         }))
-      }))
+      })),
+      pwad: PropTypes.object
     })
   };
 
   render() {
     const { run } = this.props;
     return (
-      <div>
-        <RunTitle episode={run.episode} map={run.map} iwad={run.iwad} category={run.runCategory} runTime={run.runTime} runner={run.runner} />
-        <RunVideo recordings={run.recordings} />
+      <div className="LightGray BoundingBox">
+        <Row>
+          <Col xs={12}>
+            <RunTitle episode={run.episode} map={run.map} iwad={run.iwad} category={run.runCategory} runTime={run.runTime} runner={run.runner} pwad={run.pwad}
+                      className="text-nowrap CenteredText"
+                      />
+          </Col>
+        </Row>
+        <Row>
+          <Col xs={12}>
+            <RunVideo recordings={run.recordings} className="CenteredText" />
+          </Col>
+        </Row>
         <RecordingStatus recordings={run.recordings} />
         <RunDetails run={run} />
       </div>

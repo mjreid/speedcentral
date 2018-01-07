@@ -16,7 +16,7 @@ CREATE TABLE run (
   runner VARCHAR(1024) NULL,
   submitter VARCHAR(1024) NULL,
   run_category VARCHAR(1024) NULL,
-  run_time INTERVAL NULL,
+  run_time BIGINT NULL,
   created_date TIMESTAMP NOT NULL,
   modified_date TIMESTAMP NOT NULL
 );

@@ -17,7 +17,7 @@ class Repository(
   DBs.setupAll()
   implicit val ec: ExecutionContext = executionContext
 
-  def createRun(request: CreateRunRequest): Run = {
+  def createRun(request: CreateRunRequest, maybeRunTimeMs: Option[Long]): Run = {
     DB localTx { implicit session =>
       // create PWADs first, need them because run references pwads
       val allPwads = request.primaryPwad.toSeq ++ request.secondaryPwads
@@ -30,7 +30,7 @@ class Repository(
         sql"""insert into run (map, episode, skill_level, iwad, primary_pwad_id, engine_version, runner,
                                submitter, run_category, run_time, created_date, modified_date)
               values (${request.map}, ${request.episode}, ${request.skillLevel}, ${request.iwad}, ${primaryPwadId}, ${request.engineVersion},
-                      ${request.runner}, ${request.submitter}, ${request.category}, 'PT0M0S', ${createdDate}, ${createdDate})
+                      ${request.runner}, ${request.submitter}, ${request.category}, ${maybeRunTimeMs}, ${createdDate}, ${createdDate})
               returning id
          """.updateAndReturnGeneratedKey().apply()
 

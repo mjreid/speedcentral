@@ -10,6 +10,11 @@ export default class LmpMapSelector extends Component {
     map: PropTypes.string,
     episode: PropTypes.string,
     onLmpDataChanged: PropTypes.func,
+    groupClass: PropTypes.string.required,
+    mapLabelSize: PropTypes.number.required,
+    mapInputSize: PropTypes.number.required,
+    episodeLabelSize: PropTypes.number.required,
+    episodeInputSize: PropTypes.number.required,
   };
 
   constructor(props) {
@@ -38,17 +43,17 @@ export default class LmpMapSelector extends Component {
     if (this.props.iwad === "doom") {
       return (
         <div>
-          <FormGroup bsSize="sm" controlId="episode" className="LmpUploadControl BgOne">
-            <Col componentClass={ControlLabel} sm={2}>
+          <FormGroup bsSize="sm" controlId="episode" className={this.props.groupClass}>
+            <Col componentClass={ControlLabel} sm={this.props.episodeLabelSize}>
               Episode
             </Col>
-            <Col sm={4}>
+            <Col sm={this.props.episodeInputSize}>
               <FormControl type="text" value={this.props.episode} onChange={this.handleEpisodeChange} />
             </Col>
-            <Col componentClass={ControlLabel} sm={2}>
+            <Col componentClass={ControlLabel} sm={this.props.episodeLabelSize}>
               Map
             </Col>
-            <Col sm={4}>
+            <Col sm={this.props.episodeInputSize}>
               <FormControl type="text" value={this.props.map} onChange={this.handleMapChange} />
             </Col>
           </FormGroup>
@@ -56,11 +61,11 @@ export default class LmpMapSelector extends Component {
       )
     } else {
       return (
-        <FormGroup bsSize="sm" controlId="map" className="LmpUploadControl BgOne">
-          <Col componentClass={ControlLabel} sm={2}>
+        <FormGroup bsSize="sm" controlId="map" className={this.props.groupClass}>
+          <Col componentClass={ControlLabel} sm={this.props.mapLabelSize}>
             Map
           </Col>
-          <Col sm={10}>
+          <Col sm={this.props.mapInputSize}>
             <FormControl type="text" value={this.props.map} onChange={this.handleMapChange} />
           </Col>
         </FormGroup>

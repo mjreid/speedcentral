@@ -11,7 +11,11 @@ export default class LmpResourcePwadSelector extends Component {
       pwadIdgamesLocation: PropTypes.string
     })),
     onLmpDataChanged: PropTypes.func,
-    pwadResolveRequest: PropTypes.func
+    pwadResolveRequest: PropTypes.func,
+    groupClass: PropTypes.string.required,
+    labelSize: PropTypes.number.required,
+    filenameSize: PropTypes.number.required,
+    urlSize: PropTypes.number.required,
   };
 
   constructor(props) {
@@ -60,15 +64,16 @@ export default class LmpResourcePwadSelector extends Component {
       return (<div />);
     }
 
+    const { groupClass, labelSize, filenameSize, urlSize } = this.props;
     const secondaryPwads = pwads.map(function(pwad) {
       const selectorId = `resourcePwadSelector${pwad}`;
       return (
-        <FormGroup bsSize="sm" controlId={selectorId} className="LmpUploadControl BgTwo">
-          <Col sm={2} />
-          <Col sm={3}>
+        <FormGroup bsSize="sm" controlId={selectorId} className={groupClass}>
+          <Col sm={labelSize} />
+          <Col sm={filenameSize}>
             <FormControl type="text" value={pwad.pwadFilename} onBlur={onPwadFilenameBlur} onChange={(e) => onPwadFilenameChange(pwad, e)} />
           </Col>
-          <Col sm={7}>
+          <Col sm={urlSize}>
             <FormControl type="text" value={pwad.pwadIdgamesLocation} onChange={onPwadUrlChange} />
           </Col>
         </FormGroup>

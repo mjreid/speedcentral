@@ -1,0 +1,17 @@
+.BgOne {
+    background-color: #082939;
+}
+.BgTwo {
+    background-color: #08252E;
+}
+.LightGray {
+    background-color: #202020;
+}
+.BoundingBox {
+    border-radius: 5px;
+    padding: 10px;
+}
+.CenteredText {
+    text-align: center;
+    font-size: 1.5em;
+}

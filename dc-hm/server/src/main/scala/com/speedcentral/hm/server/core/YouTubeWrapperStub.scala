@@ -7,7 +7,8 @@ import akka.actor.ActorRef
 class YouTubeWrapperStub extends YouTubeWrapper {
   override def checkYouTube(): Unit = {}
 
-  override def uploadYouTubeVideo(runId: String, videoToUpload: Path, notifyActor: ActorRef): UploadStartedInfo = {
-    UploadStartedInfo(runId, "NOTAREALVIDEOID")
+  override def uploadYouTubeVideo(recordingId: String, videoToUpload: Path, notifyActor: ActorRef): String = {
+    Thread.sleep(5000)
+    "NOTAREALVIDEOID"
   }
 }

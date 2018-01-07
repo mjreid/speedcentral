@@ -35,7 +35,7 @@ class YouTubeWrapperImpl(
     log.info(s"YouTube request result: ${response.toPrettyString}")
   }
 
-  def uploadYouTubeVideo(recordingId: String, videoToUpload: Path, notifyActor: ActorRef): UploadStartedInfo = {
+  def uploadYouTubeVideo(recordingId: String, videoToUpload: Path, notifyActor: ActorRef): String = {
     log.info(s"Building YouTube metadata for $recordingId")
     val metadata = new Video()
     val videoStatus = new VideoStatus()
@@ -58,8 +58,6 @@ class YouTubeWrapperImpl(
       val progressListener = new MediaHttpUploaderProgressListener {
         override def progressChanged(uploader: MediaHttpUploader): Unit = {
           uploader.getUploadState match {
-            case UploadState.MEDIA_COMPLETE =>
-              notifyActor ! UploadSucceeded(recordingId)
             case state =>
               log.info(s"New upload state in $recordingId progress listener: $state")
           }
@@ -72,7 +70,7 @@ class YouTubeWrapperImpl(
       val returnedVideo = videoInsert.execute()
       log.info(s"Uploaded $recordingId. YouTube ID: ${returnedVideo.getId}")
 
-      UploadStartedInfo(recordingId, returnedVideo.getId)
+      returnedVideo.getId
 
     } finally {
       inputStream.close()

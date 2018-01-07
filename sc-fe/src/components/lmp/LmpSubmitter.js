@@ -7,6 +7,9 @@ export default class LmpSubmitter extends Component {
   static propTypes = {
     submitter: PropTypes.string,
     onLmpDataChanged: PropTypes.func,
+    groupClass: PropTypes.string.required,
+    labelSize: PropTypes.number.required,
+    inputSize: PropTypes.number.required,
   };
 
   constructor(props) {
@@ -22,14 +25,16 @@ export default class LmpSubmitter extends Component {
 
   render() {
     return (
-      <FormGroup controlId="submitter">
-        <Col sm={2}>
-          Submitter
-        </Col>
-        <Col sm={10}>
-          <FormControl id="submitter" type="text" value={this.props.submitter} onChange={this.handleChange} />
-        </Col>
-      </FormGroup>
+      <div>
+        <FormGroup bsSize="sm" controlId="submitter" className={this.props.groupClass}>
+          <Col sm={this.props.labelSize} componentClass={ControlLabel}>
+            Submitter
+          </Col>
+          <Col sm={this.props.inputSize}>
+            <FormControl type="text" value={this.props.submitter} onChange={this.handleChange} />
+          </Col>
+        </FormGroup>
+      </div>
     );
   }
 }

@@ -12,7 +12,11 @@ export default class LmpPrimaryPwadSelector extends Component {
       pwadFriendlyName: PropTypes.string
     }),
     onLmpDataChanged: PropTypes.func,
-    pwadResolveRequest: PropTypes.func
+    pwadResolveRequest: PropTypes.func,
+    groupClass: PropTypes.string.required,
+    labelSize: PropTypes.number.required,
+    filenameSize: PropTypes.number.required,
+    urlSize: PropTypes.number.required,
   };
 
   constructor(props) {
@@ -40,8 +44,15 @@ export default class LmpPrimaryPwadSelector extends Component {
 
   resolvePwad(e) {
     const pwadFilename = e.target.value;
-    const { pwadResolveRequest, iwad } = this.props;
-    pwadResolveRequest(pwadFilename, iwad);
+    if (pwadFilename) {
+      const { pwadResolveRequest, iwad } = this.props;
+      pwadResolveRequest(pwadFilename, iwad);
+    } else {
+      const updatedPwad = Object.assign({}, this.props.pwad, { pwadIdgamesLocation: "" });
+      this.props.onLmpDataChanged({
+        primaryPwad: updatedPwad
+      });
+    }
   }
 
   render() {
@@ -49,14 +60,14 @@ export default class LmpPrimaryPwadSelector extends Component {
     const { pwadFilename, pwadIdgamesLocation } = this.props.pwad;
 
     return (
-      <FormGroup bsSize="sm" controlId="primaryPwadSelector" className="LmpUploadControl BgTwo">
-        <Col sm={2} componentClass={ControlLabel} >
+      <FormGroup bsSize="sm" controlId="primaryPwadSelector" className={this.props.groupClass}>
+        <Col sm={this.props.labelSize} componentClass={ControlLabel} >
           PWAD
         </Col>
-        <Col sm={3}>
+        <Col sm={this.props.filenameSize}>
           <FormControl type="text" value={pwadFilename} onBlur={this.resolvePwad} onChange={this.handleFilenameChange} />
         </Col>
-        <Col sm={7}>
+        <Col sm={this.props.urlSize}>
           <FormControl type="text" value={pwadIdgamesLocation} onChange={this.handleUrlChange} />
         </Col>
       </FormGroup>

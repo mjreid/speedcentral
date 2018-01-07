@@ -33,7 +33,7 @@ export default class RecordingStatusHistory extends Component {
   render() {
     const { state, historyTime } = this.props.history;
     const displayStatus = RecordingStatusHistory.specificStatuses[state];
-    const displayTime = moment(historyTime).format("LL LTS");
+    const displayTime = moment(historyTime).format("LTS");
     return (
       <div>{displayTime} - {displayStatus}</div>
     )

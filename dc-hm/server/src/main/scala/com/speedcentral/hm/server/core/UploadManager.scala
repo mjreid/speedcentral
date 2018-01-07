@@ -3,7 +3,7 @@ package com.speedcentral.hm.server.core
 import java.nio.file.Path
 
 import akka.actor.{Actor, ActorLogging, Props}
-import com.speedcentral.hm.server.core.DemoManager.{UploadFailed, UploadStarted}
+import com.speedcentral.hm.server.core.DemoManager.{UploadFailed, UploadStarted, UploadSucceeded}
 import com.speedcentral.hm.server.core.UploadManager.{CheckConnection, UploadVideo}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,8 +33,8 @@ class UploadManager(
       Future {
         youTubeWrapper.uploadYouTubeVideo(recordingId, videoToUpload, notifyActor)
       }(uploadExecutionContext).onComplete {
-        case Success(info) =>
-          notifyActor ! UploadStarted(info)
+        case Success(videoId) =>
+          notifyActor ! UploadSucceeded(recordingId, videoId)
         case Failure(e) =>
           log.error(e, "Error occurred uploading YouTube video")
           notifyActor ! UploadFailed(recordingId, e.getMessage)

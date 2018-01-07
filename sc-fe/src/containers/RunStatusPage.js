@@ -20,6 +20,24 @@ class RunStatusPage extends Component {
     this.interval = setInterval(function () { runStatusRequest(runId); }, 2000);
   }
 
+  componentWillReceiveProps(nextProps) {
+    // If terminal state, clear the interval
+    if (nextProps.run && nextProps.run.recordings && nextProps.run.recordings.length > 0) {
+      const recording = nextProps.run.recordings[0];
+      if (recording.history && recording.history.length > 0) {
+        const history = recording.history[0];
+        if (this.interval && this.isTerminalState(history.state)) {
+          clearInterval(this.interval);
+        }
+      }
+    }
+  }
+
+  isTerminalState(state) {
+    return (state === "upload_succeeded" || state === "pwad_resolve_failed"
+      || state === "exe_recording_failed" || state === "upload_failed");
+  }
+
   componentWillUnmount() {
     if (this.interval) {
       clearInterval(this.interval);

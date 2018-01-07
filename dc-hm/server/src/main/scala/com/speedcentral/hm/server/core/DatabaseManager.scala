@@ -44,15 +44,15 @@ class DatabaseManager(
         repository.createRecordingHistory(id, "exe_recording_failed")
       }
 
-    case LogUploadStarted(recordingId, videoId) =>
+    case LogUploadStarted(recordingId) =>
       extractId(recordingId) { id =>
         repository.createRecordingHistory(id, "upload_started")
-        repository.addVideoToRecording(id, videoId)
       }
 
-    case LogUploadSucceeded(recordingId) =>
+    case LogUploadSucceeded(recordingId, videoId) =>
       extractId(recordingId) { id =>
         repository.createRecordingHistory(id, "upload_succeeded")
+        repository.addVideoToRecording(id, videoId)
       }
 
     case LogUploadFailed(recordingId, _) =>
@@ -109,9 +109,9 @@ object DatabaseManager {
 
   case class LogExeRecordingSucceeded(recordingId: String)
 
-  case class LogUploadStarted(recordingId: String, videoId: String)
+  case class LogUploadStarted(recordingId: String)
 
-  case class LogUploadSucceeded(recordingId: String)
+  case class LogUploadSucceeded(recordingId: String, videoId: String)
 
   case class LogUploadFailed(recordingId: String, error: String)
 

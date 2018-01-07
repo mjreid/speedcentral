@@ -1,5 +1,6 @@
 export function generateRunTitle(
   iwad,
+  pwad,
   map,
   episode,
   runTime,
@@ -10,7 +11,20 @@ export function generateRunTitle(
   const dCategory = categoryProperName(category);
   const dMap= mapProperName(iwad, map, episode);
 
-  return `${dIwad} - ${dMap} (${dCategory}) in ${runTime} by ${runner}`;
+  let pwadDisplay = "";
+  if (pwad) {
+    pwadDisplay = ` ${pwad} -`
+  }
+  let runTimeDisplay = "";
+  if (runTime) {
+    runTimeDisplay = ` in ${runTime}`;
+  }
+  let runnerDisplay = "";
+  if (runner) {
+    runnerDisplay = ` by ${runner}`;
+  }
+
+  return `${dIwad} -${pwadDisplay} ${dMap} (${dCategory})${runTimeDisplay}${runnerDisplay}`;
 }
 
 export function iwadProperName(iwad) {

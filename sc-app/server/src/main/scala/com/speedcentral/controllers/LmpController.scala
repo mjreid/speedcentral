@@ -1,5 +1,8 @@
 package com.speedcentral.controllers
 
+import java.time.{Duration, LocalTime}
+import java.time.format.DateTimeFormatter
+
 import com.speedcentral.ScAppException
 import com.speedcentral.api._
 import com.speedcentral.db.{ApiConverter, Repository}
@@ -7,7 +10,7 @@ import com.speedcentral.hm.HmClient
 import com.speedcentral.lmp.{LmpAnalyzer, PwadAnalyzer}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Success
+import scala.util.{Success, Try}
 
 class LmpController(
   repository: Repository,
@@ -29,7 +32,8 @@ class LmpController(
   def createNewRun(createRunRequest: CreateRunRequest)(implicit ec: ExecutionContext): Future[CreateRunResult] = {
     val validated = validateRunRequest(createRunRequest)
     Future {
-      repository.createRun(validated)
+      val maybeRunTimeMs = getRunTimeMs(createRunRequest)
+      repository.createRun(validated, maybeRunTimeMs)
     }.map { createdRun =>
       CreateRunResult(runId = createdRun.id.toString)
     }.andThen {
@@ -66,9 +70,26 @@ class LmpController(
     // Include only secondary pwads that have a nonempty filename
     val secondaryPwads = request.secondaryPwads.filter(p => p.pwadFilename.trim.nonEmpty)
 
+    // If runTime is an invalid string, turn it into None
+    val runTime = request.runTime.flatMap { r =>
+      Try {
+        LocalTime.parse(r, DateTimeFormatter.ofPattern("HH:mm:ss"))
+        r
+      }.toOption
+    }
+
     request.copy(
       primaryPwad = pwad,
-      secondaryPwads = secondaryPwads
+      secondaryPwads = secondaryPwads,
+      runTime = runTime
     )
+  }
+
+  private def getRunTimeMs(request: CreateRunRequest): Option[Long] = {
+    request.runTime.map { r =>
+      val localTime = LocalTime.parse(r, DateTimeFormatter.ofPattern("HH:mm:ss"))
+      val duration = Duration.between(LocalTime.MIN, localTime)
+      duration.toMillis
+    }
   }
 }

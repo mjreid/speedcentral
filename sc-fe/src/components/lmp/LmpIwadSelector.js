@@ -8,6 +8,9 @@ export default class LmpIwadSelector extends Component {
   static propTypes = {
     iwad: PropTypes.string,
     onLmpDataChanged: PropTypes.func,
+    groupClass: PropTypes.string.required,
+    labelSize: PropTypes.number.required,
+    inputSize: PropTypes.number.required
   };
 
 
@@ -25,11 +28,11 @@ export default class LmpIwadSelector extends Component {
   render() {
     // Adblock Plus blocks elements with id "iwad" (WTF?)
     return (
-      <FormGroup controlId="doomIwad" className="LmpUploadControl BgTwo" bsSize="sm">
-        <Col componentClass={ControlLabel} sm={2}>
+      <FormGroup controlId="doomIwad" className={this.props.groupClass} bsSize="sm">
+        <Col componentClass={ControlLabel} sm={this.props.labelSize}>
           IWAD
         </Col>
-        <Col sm={10}>
+        <Col sm={this.props.inputSize}>
           <FormControl componentClass="select" placeholder="doom2" value={this.props.iwad} onChange={this.handleChange} >
             <option value="doom">Doom</option>
             <option value="doom2">Doom 2</option>

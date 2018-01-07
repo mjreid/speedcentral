@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {FormGroup, ControlLabel, FormControl, Col} from 'react-bootstrap';
+import "./Lmp.css"
 
-
-export default class LmpRunner extends Component {
+export default class LmpRuntimeSelector extends Component {
 
   static propTypes = {
-    runner: PropTypes.string,
-    onLmpDataChanged: PropTypes.func,
+    runTimeIso: PropTypes.string.required,
+    onLmpDataChanged: PropTypes.func.required,
     groupClass: PropTypes.string.required,
     labelSize: PropTypes.number.required,
     inputSize: PropTypes.number.required,
@@ -15,24 +15,24 @@ export default class LmpRunner extends Component {
 
   constructor(props) {
     super(props);
-
-    this.handleChange = this.handleChange.bind(this);
+    this.onBlur = this.onBlur.bind(this);
   }
 
-  handleChange(event) {
-    const runner = event.target.value;
-    this.props.onLmpDataChanged({runner: runner});
+  onBlur(event) {
+    const runTime = event.target.value;
+    this.props.onLmpDataChanged({ runTime: runTime });
   }
+
 
   render() {
     return (
       <div>
-        <FormGroup bsSize="sm" controlId="runner" className={this.props.groupClass}>
+        <FormGroup bsSize="sm" controlId="runtime" className={this.props.groupClass}>
           <Col sm={this.props.labelSize} componentClass={ControlLabel}>
-            Runner
+            Run Time
           </Col>
           <Col sm={this.props.inputSize}>
-            <FormControl id="runner" type="text" value={this.props.runner} onChange={this.handleChange} />
+            <FormControl type="text" value={this.props.runTime} onBlur={this.onBlur} placeholder="HH:MM:SS"/>
           </Col>
         </FormGroup>
       </div>

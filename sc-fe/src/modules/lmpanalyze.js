@@ -52,7 +52,7 @@ export default function reducer(state = initialState, action = {}) {
       const response = fixMissingPrimaryPwad(action.response);
       return {
         ...state,
-        analysisResult: Object.assign({}, response, { lmp: action.lmp })
+        analysisResult: Object.assign({}, response, { lmp: action.lmp, category: "uv-max" })
       };
     case LMP_ANALYZE_FAILURE:
       return {

@@ -7,6 +7,9 @@ export default class LmpCategorySelector extends Component {
   static propTypes = {
     category: PropTypes.string,
     onLmpDataChanged: PropTypes.func,
+    groupClass: PropTypes.string.required,
+    labelSize: PropTypes.number.required,
+    inputSize: PropTypes.number.required
   };
 
   constructor(props) {
@@ -22,11 +25,11 @@ export default class LmpCategorySelector extends Component {
 
   render() {
     return (
-      <FormGroup bsSize="sm" controlId="category" className="LmpUploadControl BgTwo">
-        <Col componentClass={ControlLabel} sm={2}>
+      <FormGroup bsSize="sm" controlId="category" className={this.props.groupClass}>
+        <Col componentClass={ControlLabel} sm={this.props.labelSize}>
           Category
         </Col>
-        <Col sm={10}>
+        <Col sm={this.props.inputSize}>
           <FormControl componentClass="select" value={this.props.category} onChange={this.handleChange} >
             <option value="uv-max">UV Max</option>
             <option value="uv-speed">UV Speed</option>
