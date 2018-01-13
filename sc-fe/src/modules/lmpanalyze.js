@@ -43,8 +43,8 @@ export function pwadResolveSuccess(pwadFilename, response) {
   return { type: PWAD_RESOLVE_SUCCESS, pwadFilename, response };
 }
 
-export function pwadResolveFailure(error) {
-  return { type: PWAD_RESOLVE_FAILURE, error };
+export function pwadResolveFailure(pwadFilename, error) {
+  return { type: PWAD_RESOLVE_FAILURE, errorPwadFilename: pwadFilename, error };
 }
 
 export default function reducer(state = initialState, action = {}) {
@@ -69,36 +69,38 @@ export default function reducer(state = initialState, action = {}) {
       };
     case PWAD_RESOLVE_SUCCESS:
       const { pwadFilename, pwadIdgamesLocation } = action.response;
-      if (state.analysisResult.primaryPwad && (state.analysisResult.primaryPwad.pwadFilename === pwadFilename
-          || state.analysisResult.primaryPwad.pwadFilename === pwadFilename + ".wad"
-          || state.analysisResult.primaryPwad.pwadFilename === pwadFilename + ".zip")) {
+      const maybePrimaryPwad = maybeUpdatedPrimaryPwad(state, pwadFilename, pwadIdgamesLocation);
+      if (maybePrimaryPwad) {
         return {
           ...state,
-          analysisResult: Object.assign({}, state.analysisResult, { primaryPwad: { pwadFilename, pwadIdgamesLocation }})
-        }
-      } else if (state.analysisResult.secondaryPwads) {
-        const updatedSecondaryPwads = state.analysisResult.secondaryPwads.map(function(pwad) {
-          if (pwad.pwadFilename === pwadFilename
-            || pwad.pwadFilename === pwadFilename + ".wad"
-            || pwad.pwadFilename === pwadFilename + ".zip") {
-            return { pwadFilename, pwadIdgamesLocation };
-          } else {
-            return pwad;
-          }
-        });
-        return {
-          ...state,
-          analysisResult: Object.assign({}, state.analysisResult, { secondaryPwads: updatedSecondaryPwads })
-        }
+          analysisResult: Object.assign({}, state.analysisResult, { primaryPwad: maybePrimaryPwad })
+        };
       } else {
-        return state;
+        const maybeSecondaryPwads = maybeUpdatedSecondaryPwads(state, pwadFilename, pwadIdgamesLocation);
+        if (maybeSecondaryPwads) {
+          return {
+            ...state,
+            analysisResult: Object.assign({}, state.analysisResult, {secondaryPwads: maybeSecondaryPwads})
+          };
+        } else {
+          return state;
+        }
       }
 
     case PWAD_RESOLVE_FAILURE:
-      return {
-        ...state,
-        errorMessage: action.error
-      };
+      const { errorPwadFilename, error } = action;
+      const maybeErrorPwad = maybeUpdatedPrimaryPwad(state, errorPwadFilename, "", "Could not find PWAD");
+      if (maybeErrorPwad) {
+        return {
+          ...state,
+          analysisResult: Object.assign({}, state.analysisResult, { primaryPwad: maybeErrorPwad })
+        };
+      } else {
+        return {
+          ...state,
+          errorMessage: action.error
+        };
+      }
     default:
       return state;
   }
@@ -111,6 +113,35 @@ function fixMissingPrimaryPwad(lmpData) {
   return lmpData;
 }
 
+// Returns a new primary PWAD object if the pwadFilename matches the primary pwad in the state.
+// Otherwise returns null.
+function maybeUpdatedPrimaryPwad(state, pwadFilename, pwadIdgamesLocation, errorMessage = undefined) {
+  if (state.analysisResult.primaryPwad && (state.analysisResult.primaryPwad.pwadFilename === pwadFilename
+      || state.analysisResult.primaryPwad.pwadFilename === pwadFilename + ".wad"
+      || state.analysisResult.primaryPwad.pwadFilename === pwadFilename + ".zip")) {
+    return { pwadFilename, pwadIdgamesLocation, errorMessage };
+  } else {
+    return null;
+  }
+}
+
+// Returns a new list of secondary PWADS if the pwadFilename matches any of the secondary pwads.
+// Otherwise returns null.
+function maybeUpdatedSecondaryPwads(state, pwadFilename, pwadIdgamesLocation, errorMessage = undefined) {
+  if (state.analysisResult.secondaryPwads) {
+    return state.analysisResult.secondaryPwads.map(function(pwad) {
+      if (pwad.pwadFilename === pwadFilename
+        || pwad.pwadFilename === pwadFilename + ".wad"
+        || pwad.pwadFilename === pwadFilename + ".zip") {
+        return { pwadFilename, pwadIdgamesLocation, errorMessage };
+      } else {
+        return pwad;
+      }
+    });
+  } else {
+    return null;
+  }
+}
 
 function* analyzeLmp(lmpAnalyzeRequest) {
   try {
@@ -127,7 +158,7 @@ function* resolvePwad(pwadResolveRequest) {
     const resolveResults = yield call(api.resolvePwad, pwadResolveRequest.pwadFilename, pwadResolveRequest.iwad);
     yield put(pwadResolveSuccess(pwadResolveRequest.pwadFilename, resolveResults));
   } catch(error) {
-    yield put(pwadResolveFailure(SERVER_FAILED));
+    yield put(pwadResolveFailure(pwadResolveRequest.pwadFilename, SERVER_FAILED));
   }
 }
 

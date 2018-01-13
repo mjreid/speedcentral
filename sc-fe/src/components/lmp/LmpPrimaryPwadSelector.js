@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {FormGroup, ControlLabel, FormControl, Col} from 'react-bootstrap';
+import {FormGroup, ControlLabel, FormControl, Col, HelpBlock} from 'react-bootstrap';
 import "./Lmp.css"
 
 export default class LmpPrimaryPwadSelector extends Component {
@@ -9,7 +9,8 @@ export default class LmpPrimaryPwadSelector extends Component {
     pwad: PropTypes.shape({
       pwadFilename: PropTypes.string,
       pwadIdgamesLocation: PropTypes.string,
-      pwadFriendlyName: PropTypes.string
+      pwadFriendlyName: PropTypes.string,
+      errorMessage: PropTypes.string,
     }),
     onLmpDataChanged: PropTypes.func,
     pwadResolveRequest: PropTypes.func,
@@ -60,20 +61,29 @@ export default class LmpPrimaryPwadSelector extends Component {
     }
   }
 
+  getValidationState() {
+    if (this.props.pwad.errorMessage) {
+      return "error";
+    } else {
+      return null;
+    }
+  }
+
   render() {
 
-    const { pwadFilename, pwadIdgamesLocation } = this.props.pwad;
+    const { pwadFilename, pwadIdgamesLocation, errorMessage } = this.props.pwad;
 
     return (
-      <FormGroup bsSize="sm" controlId="primaryPwadSelector" className={this.props.groupClass}>
+      <FormGroup bsSize="sm" controlId="primaryPwadSelector" className={this.props.groupClass} validationState={this.getValidationState()}>
         <Col sm={this.props.labelSize} componentClass={ControlLabel} >
           PWAD
         </Col>
         <Col sm={this.props.filenameSize}>
           <FormControl type="text" value={pwadFilename} onBlur={this.resolvePwad} onChange={this.handleFilenameChange} />
+          {errorMessage && <HelpBlock>{errorMessage}</HelpBlock>}
         </Col>
         <Col sm={this.props.urlSize}>
-          <FormControl type="text" value={pwadIdgamesLocation} onChange={this.handleUrlChange} />
+          <FormControl type="text" value={pwadIdgamesLocation} onChange={this.handleUrlChange} disabled={true} />
         </Col>
       </FormGroup>
     )
