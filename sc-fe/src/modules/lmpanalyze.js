@@ -69,14 +69,18 @@ export default function reducer(state = initialState, action = {}) {
       };
     case PWAD_RESOLVE_SUCCESS:
       const { pwadFilename, pwadIdgamesLocation } = action.response;
-      if (state.analysisResult.primaryPwad && state.analysisResult.primaryPwad.pwadFilename === pwadFilename) {
+      if (state.analysisResult.primaryPwad && (state.analysisResult.primaryPwad.pwadFilename === pwadFilename
+          || state.analysisResult.primaryPwad.pwadFilename === pwadFilename + ".wad"
+          || state.analysisResult.primaryPwad.pwadFilename === pwadFilename + ".zip")) {
         return {
           ...state,
           analysisResult: Object.assign({}, state.analysisResult, { primaryPwad: { pwadFilename, pwadIdgamesLocation }})
         }
       } else if (state.analysisResult.secondaryPwads) {
         const updatedSecondaryPwads = state.analysisResult.secondaryPwads.map(function(pwad) {
-          if (pwad.pwadFilename === pwadFilename) {
+          if (pwad.pwadFilename === pwadFilename
+            || pwad.pwadFilename === pwadFilename + ".wad"
+            || pwad.pwadFilename === pwadFilename + ".zip") {
             return { pwadFilename, pwadIdgamesLocation };
           } else {
             return pwad;

@@ -43,8 +43,13 @@ export default class LmpPrimaryPwadSelector extends Component {
   }
 
   resolvePwad(e) {
-    const pwadFilename = e.target.value;
+    let pwadFilename = e.target.value;
+
     if (pwadFilename) {
+      pwadFilename = pwadFilename.trim().toLowerCase();
+      if (pwadFilename.endsWith(".wad") || pwadFilename.endsWith(".zip")) {
+        pwadFilename = pwadFilename.substr(0, pwadFilename.length - 4);
+      }
       const { pwadResolveRequest, iwad } = this.props;
       pwadResolveRequest(pwadFilename, iwad);
     } else {
