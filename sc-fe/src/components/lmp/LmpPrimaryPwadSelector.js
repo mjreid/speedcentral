@@ -27,7 +27,7 @@ export default class LmpPrimaryPwadSelector extends Component {
   }
 
   handleFilenameChange(e) {
-    const updatedFilename = e.target.value;
+    const updatedFilename = e.target.value.toLowerCase();
     const updatedPwad = Object.assign({}, this.props.pwad, { pwadFilename: updatedFilename });
     this.props.onLmpDataChanged({
       primaryPwad: updatedPwad
@@ -35,7 +35,7 @@ export default class LmpPrimaryPwadSelector extends Component {
   }
 
   handleUrlChange(e) {
-    const updatedUrl = e.target.value;
+    const updatedUrl = e.target.value.toLowerCase();
     const updatedPwad = Object.assign({}, this.props.pwad, { pwadIdgamesLocation: updatedUrl });
     this.props.onLmpDataChanged({
       primaryPwad: updatedPwad
