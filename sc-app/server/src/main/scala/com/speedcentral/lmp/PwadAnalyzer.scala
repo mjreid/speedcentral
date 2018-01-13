@@ -142,7 +142,7 @@ class PwadAnalyzer(
   private def pwadToBucket(pwadName: String): String = {
     if (pwadName.length == 0) throw ScAppException(s"Invalid PWAD name $pwadName")
     val first = pwadName.toLowerCase()(0)
-    val maybeBucket = buckets.find(bucket => bucket._1 <= first && bucket._2 > first)
+    val maybeBucket = buckets.find(bucket => bucket._1 <= first && bucket._2 >= first)
     maybeBucket.map { case (c1, c2) => s"/$c1-$c2" }
       .getOrElse(throw ScAppException(s"Could not find bucket for $pwadName ($first)"))
   }
