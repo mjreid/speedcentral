@@ -57,7 +57,9 @@ object Server
 
     val demoManager = system.actorOf(DemoManager.props(databaseManager, recordingManager, uploadManager, pwadDownloader))
 
-    val bindingFuture = Http().bindAndHandle(buildRoutes(demoManager, uploadManager, databaseManager, hmConfig), "localhost", 10666)
+    val bindingFuture = Http().bindAndHandle(buildRoutes(demoManager, uploadManager, databaseManager, hmConfig),
+      hmConfig.bindAddress,
+      hmConfig.port)
 
     system.registerOnTermination({
       println("Terminating!")

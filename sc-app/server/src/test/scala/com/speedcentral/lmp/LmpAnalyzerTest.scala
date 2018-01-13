@@ -15,6 +15,7 @@ class LmpAnalyzerTest extends FlatSpec with Matchers with ScalaFutures with Befo
   private var classicBoomDemo: Array[Byte] = _
   private var prboomPlusDemo: Array[Byte] = _
   private var multiWadPrboomDemo: Array[Byte] = _
+  private var longDemo: Array[Byte] = _
   private var lmpAnalyzer: LmpAnalyzer = _
 
   implicit val patience: PatienceConfig = PatienceConfig(timeout = Span(2, Seconds), interval = Span(100, Millis))
@@ -25,6 +26,7 @@ class LmpAnalyzerTest extends FlatSpec with Matchers with ScalaFutures with Befo
     classicBoomDemo = streamToBytes(classLoader.getResourceAsStream("classic-boom-demo.LMP"))
     prboomPlusDemo = streamToBytes(classLoader.getResourceAsStream("prboom-plus-demo.lmp"))
     multiWadPrboomDemo = streamToBytes(classLoader.getResourceAsStream("multiwad-test.lmp"))
+    longDemo = streamToBytes(classLoader.getResourceAsStream("longdemo.lmp"))
     val pwadAnalyzer = new PwadAnalyzer("http://www.gamers.org/pub/idgames") // "unit test", sure...
     lmpAnalyzer = new LmpAnalyzer(pwadAnalyzer)
   }
@@ -42,10 +44,16 @@ class LmpAnalyzerTest extends FlatSpec with Matchers with ScalaFutures with Befo
     }
   }
 
-  it should "fail to parse a Boom demo" in {
+  it should "parse a Boom demo" in {
     val resultF = lmpAnalyzer.analyze(classicBoomDemo)
-    whenReady(resultF.failed) { res =>
-
+    whenReady(resultF) { result =>
+      result.skillLevel should be(Some(3))
+      result.map should be(Some(5))
+      result.episode should be(Some(1))
+      result.engineVersion should be(Some("doom2"))
+      result.iwad should be("doom2")
+      result.primaryPwad should be(None)
+      result.secondaryPwads should be(Seq.empty)
     }
   }
 
@@ -78,6 +86,13 @@ class LmpAnalyzerTest extends FlatSpec with Matchers with ScalaFutures with Befo
     whenReady(resultF) { result =>
       result.primaryPwad should be(Some(ApiPwad("mm2", "/themes/mm/mm2.zip")))
       result.secondaryPwads should be(Seq(ApiPwad("mm2mus", "/themes/mm/mm2.zip")))
+    }
+  }
+
+  it should "reject a long demo" in {
+    val resultF = lmpAnalyzer.analyze(longDemo)
+    whenReady(resultF.failed) { t =>
+      t shouldBe a[InvalidLmpException]
     }
   }
 

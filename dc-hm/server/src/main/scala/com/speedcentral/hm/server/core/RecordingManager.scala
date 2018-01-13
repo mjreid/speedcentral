@@ -18,10 +18,8 @@ class RecordingManager(
     case BeginRecording(recordingId) =>
       val requestor = sender()
       // Run the beginRecording call on the separate EC.
-      Future {
-        requestor ! RecordingStarted(recordingId)
-        recorder.beginRecording(recordingId)
-      }(recordingExecutionContext).onComplete {
+      requestor ! RecordingStarted(recordingId)
+        recorder.beginRecording(recordingId)(recordingExecutionContext).onComplete {
         case Success(recordingResult) =>
           requestor ! RecordingComplete(recordingResult)
         case Failure(e) =>

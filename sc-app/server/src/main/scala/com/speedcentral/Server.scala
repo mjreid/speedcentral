@@ -29,7 +29,10 @@ object Server
     implicit val materializer: ActorMaterializer = ActorMaterializer()
     implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 
-    val bindingFuture = Http().bindAndHandle(buildRoutes(), "localhost", 8080)
+    val config = ConfigFactory.load()
+    val port = config.getInt("app.port")
+    val bindAddress = config.getString("app.bind-address")
+    val bindingFuture = Http().bindAndHandle(buildRoutes(), bindAddress, port)
 
     system.registerOnTermination({
       println("Terminating!")

@@ -15,6 +15,8 @@ case class HmConfig(
   pwadDirectory: Path,
   lmpDirectory: Path,
   vidDirectory: Path,
+  port: Int,
+  bindAddress: String,
   youTubeConfig: YouTubeConfig,
   idgamesConfig: IdgamesConfig
 )
@@ -68,6 +70,9 @@ object HmConfig {
       val youTubeConfig = YouTubeConfig.fromConfig(config)
       val idgamesConfig = IdgamesConfig.fromConfig(config)
 
+      val port = config.getInt("dc-hm.port")
+      val bindAddress = config.getString("dc-hm.bind-address")
+
       HmConfig(
         masterApiKey,
         prboomPlusExeFile,
@@ -75,6 +80,8 @@ object HmConfig {
         pwadDirectoryFile,
         lmpDirectoryFile,
         vidDirectoryFile,
+        port,
+        bindAddress,
         youTubeConfig,
         idgamesConfig
       )

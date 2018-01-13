@@ -3,9 +3,10 @@ package com.speedcentral.hm.server.core
 import java.nio.file.{Files, Path, StandardOpenOption}
 
 import com.speedcentral.hm.server.config.{HmConfig, IWads}
-import com.speedcentral.hm.server.db.Repository
+import com.speedcentral.hm.server.db.{Repository, Run}
 import org.slf4j.LoggerFactory
 
+import scala.concurrent.{ExecutionContext, Future}
 import scala.sys.process._
 
 class Recorder(
@@ -15,32 +16,38 @@ class Recorder(
 
   private val logger = LoggerFactory.getLogger(classOf[Recorder])
 
-  def beginRecording(recordingId: String): RecordingResult = {
+  def beginRecording(recordingId: String)(implicit ec: ExecutionContext): Future[RecordingResult] = {
     val lmpPath = buildLmpPath(recordingId)
     if (!Files.exists(lmpPath) || !Files.isRegularFile(lmpPath)) {
       logger.warn(s"LMP not found! ${lmpPath.toString}")
-      RecordingFailure(recordingId, "stdout", "stderr")
+      Future.successful(RecordingFailure(recordingId, "stdout", "stderr"))
     } else {
       val pwads = repository.loadPwads(recordingId.toLong)
       val pwadsToInclude = pwads.filter(_.idgamesUrl.toLowerCase != "iwad").map { p =>
         p.localPath(hmConfig.pwadDirectory)
       }
+      repository.loadRunOfRecording(recordingId.toLong).map { maybeRun =>
+        val run = maybeRun.getOrElse(throw new RuntimeException("Run not found?"))
+        val cmd = buildCommand(recordingId, lmpPath, pwadsToInclude, run)
+        logger.info(cmd.mkString(" "))
 
-      val cmd = buildCommand(recordingId, lmpPath, pwadsToInclude)
-      logger.info(cmd.mkString(" "))
+        val stdout = new StringBuilder
+        val stderr = new StringBuilder
+        // This will block while prboom runs!
+        cmd.! // ProcessLogger(stdout append _, stderr append _)
+        logger.info(s"STDOUT for ${cmd.mkString(" ")} - ${stdout.toString()}")
+        logger.info(s"STDERR for ${cmd.mkString(" ")} - ${stderr.toString()}")
 
-      // This will block while prboom runs!
-      cmd.!
+        val expectedOutput = buildOutputVideoPath(recordingId)
+        waitForOutputFileToBeWritten(expectedOutput)
 
-      val expectedOutput = buildOutputVideoPath(recordingId)
-      waitForOutputFileToBeWritten(expectedOutput)
-
-      if (!Files.exists(expectedOutput)) {
-        logger.info(s"Didn't find expected file ${expectedOutput.toString} after 10s!")
-        RecordingFailure(recordingId, "stdout", "stderr")
-      } else {
-        logger.info(s"Recording succeeded for ${expectedOutput.toString}")
-        RecordingSuccess(recordingId, "stdout", "stderr", expectedOutput)
+        if (!Files.exists(expectedOutput)) {
+          logger.info(s"Didn't find expected file ${expectedOutput.toString} after 10s!")
+          RecordingFailure(recordingId, "stdout", "stderr")
+        } else {
+          logger.info(s"Recording succeeded for ${expectedOutput.toString}")
+          RecordingSuccess(recordingId, "stdout", "stderr", expectedOutput)
+        }
       }
     }
   }
@@ -71,15 +78,15 @@ class Recorder(
     hmConfig.lmpDirectory.resolve(recordingId + ".lmp")
   }
 
-  private def buildCommand(runId: String, lmp: Path, pwadsToInclude: Seq[Path]): Seq[String] = {
+  private def buildCommand(recordingId: String, lmp: Path, pwadsToInclude: Seq[Path], run: Run): Seq[String] = {
     val baseCommand = Seq(
       hmConfig.prboomPlusExe.normalize().toString,
       "-iwad",
-      hmConfig.iwadDirectory.resolve(IWads.Doom2).normalize().toString,
+      hmConfig.iwadDirectory.resolve(IWads.fromString(run.iwad)).normalize().toString,
       "-timedemo",
       lmp.normalize().toString,
       "-viddump",
-      buildOutputVideoPath(runId).toString
+      buildOutputVideoPath(recordingId).toString
     )
 
     val pwads = pwadsToInclude.flatMap (pwad => Seq("-file", pwad.toString))

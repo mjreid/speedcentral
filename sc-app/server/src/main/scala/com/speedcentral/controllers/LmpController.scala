@@ -7,7 +7,7 @@ import com.speedcentral.ScAppException
 import com.speedcentral.api._
 import com.speedcentral.db.{ApiConverter, Repository}
 import com.speedcentral.hm.HmClient
-import com.speedcentral.lmp.{LmpAnalyzer, PwadAnalyzer}
+import com.speedcentral.lmp.{InvalidLmpException, LmpAnalyzer, LmpConstants, PwadAnalyzer}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Success, Try}
@@ -76,6 +76,13 @@ class LmpController(
         LocalTime.parse(r, DateTimeFormatter.ofPattern("HH:mm:ss"))
         r
       }.toOption
+    }
+
+    // Make sure people don't bypass the demo length check
+    val maxLength = 10 * 60 // seconds
+    val demoLength = request.lmpBytes.length / LmpConstants.BytesPerTic / LmpConstants.TicsPerSecond
+    if (demoLength > maxLength) {
+      Future.failed(InvalidLmpException(s"Estimated demo length $demoLength exceeded maximum length $maxLength"))
     }
 
     request.copy(

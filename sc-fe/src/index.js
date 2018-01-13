@@ -18,4 +18,3 @@ ReactDOM.render(
     history={history} />,
   document.getElementById('root')
 );
-registerServiceWorker();

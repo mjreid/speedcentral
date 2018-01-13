@@ -39,7 +39,7 @@ export const api = {
 
 function getBaseUrl() {
   if (process.env.NODE_ENV === 'production') {
-    return 'unknown'
+    return 'http://ec2-34-216-49-140.us-west-2.compute.amazonaws.com:8080'
   } else {
     return 'http://localhost:8080'
   }

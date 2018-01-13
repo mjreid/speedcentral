@@ -1,10 +1,11 @@
 package com.speedcentral.configuration
 
 import akka.http.scaladsl.model.HttpMethods._
-import akka.http.scaladsl.model.{StatusCodes, HttpResponse}
+import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.model.headers._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{Directive0, Route}
+import com.typesafe.config.ConfigFactory
 
 /**
   * Trait that configures responses to allow CORS support.
@@ -12,7 +13,7 @@ import akka.http.scaladsl.server.{Directive0, Route}
   */
 trait CorsSupport {
   lazy val allowedOrigin: HttpOrigin = {
-    HttpOrigin("http://localhost:3000")
+    HttpOrigin(ConfigFactory.load().getString("app.cors-address"))
   }
 
   private def addAccessControlHeaders(): Directive0 = {

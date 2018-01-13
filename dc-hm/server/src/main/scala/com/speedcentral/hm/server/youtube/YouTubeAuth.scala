@@ -36,7 +36,10 @@ class YouTubeAuth(
       .setCredentialDataStore(dataStore)
       .build()
 
-    val localReceiver = new LocalServerReceiver.Builder().setPort(youTubeConfig.receiverPort).build()
+    val localReceiver = new LocalServerReceiver.Builder()
+      .setPort(youTubeConfig.receiverPort)
+      .setHost(youTubeConfig.callbackUrl)
+      .build()
 
     new AuthorizationCodeInstalledApp(flow, localReceiver).authorize("user")
   }

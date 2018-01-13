@@ -17,18 +17,22 @@ class LmpAnalyzer(
   private val wadSuffix = ".wad"
 
   def analyze(lmp: Array[Byte])(implicit ec: ExecutionContext): Future[LmpAnalysisResult] = {
-    if (lmp(0) == LmpConstants.EngineVersion.doom_19) {
-      val skillLevel = lmp(1).toInt
-      val episode = lmp(2).toInt
-      val map = lmp(3).toInt
+    // First check and ensure that the length is within allowed limits
+    val maxLength = 10 * 60 // seconds
+    val demoLength = lmp.length / LmpConstants.BytesPerTic / LmpConstants.TicsPerSecond
+    if (demoLength > maxLength) {
+      Future.failed(InvalidLmpException(s"Estimated demo length $demoLength exceeded maximum length $maxLength"))
+    }
 
+    val maybeBasicLmpInfo = buildBasicLmpInfo(lmp)
+    maybeBasicLmpInfo.map { basicLmpInfo =>
       val endOfDemoIndex = lmp.indexOf(LmpConstants.EndOfDemoMarker)
       if (endOfDemoIndex == -1) throw InvalidLmpException(s"Did not find end of demo marker; corrupt lmp file?")
       val demoFooterBytes = lmp.slice(endOfDemoIndex + 1, lmp.length)
       val demoFooterString = new String(demoFooterBytes, StandardCharsets.US_ASCII).toLowerCase
 
       val iwad = findIwad(demoFooterString).getOrElse {
-        if (episode > 1) "doom" else "doom2"
+        if (basicLmpInfo.episode > 1) "doom" else "doom2"
       }
       val pwads = findPwads(demoFooterString)
       val engine = getEngine(demoFooterString)
@@ -47,16 +51,16 @@ class LmpAnalyzer(
         }
 
         LmpAnalysisResult(
-          episode = Some(episode),
-          map = Some(map),
-          skillLevel = Some(skillLevel),
+          episode = Some(basicLmpInfo.episode),
+          map = Some(basicLmpInfo.map),
+          skillLevel = Some(basicLmpInfo.skillLevel),
           engineVersion = engine,
           iwad = iwad,
           primaryPwad = pwads._1,
           secondaryPwads = pwads._2
         )
       }
-    } else {
+    }.getOrElse {
       Future.failed(InvalidLmpException(s"Unsupported engine version ${lmp(0)}"))
     }
   }
@@ -66,6 +70,24 @@ class LmpAnalyzer(
       Some("prboom-plus")
     } else {
       Some("doom2")
+    }
+  }
+
+  case class BasicLmpInfo(skillLevel: Int, episode: Int, map: Int)
+
+  private def buildBasicLmpInfo(lmp: Array[Byte]): Option[BasicLmpInfo] = {
+    if (lmp(0) == LmpConstants.EngineVersion.doom_19) {
+      val skillLevel = lmp(LmpConstants.Doom19Indexes.skillLevel).toInt
+      val episode = lmp(LmpConstants.Doom19Indexes.episode).toInt
+      val map = lmp(LmpConstants.Doom19Indexes.map).toInt
+      Some(BasicLmpInfo(skillLevel, episode, map))
+    } else if (lmp(0) == LmpConstants.EngineVersion.boom) {
+      val skillLevel = lmp(LmpConstants.BoomIndexes.skillLevel).toInt
+      val episode = lmp(LmpConstants.BoomIndexes.episode).toInt
+      val map = lmp(LmpConstants.BoomIndexes.map).toInt
+      Some(BasicLmpInfo(skillLevel, episode, map))
+    } else {
+      None
     }
   }
 
