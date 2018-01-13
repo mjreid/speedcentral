@@ -108,9 +108,28 @@ class PwadAnalyzer(
           } else {
             // test Ports folder
             val portsIdgamesPath = s"$basePath$portsSubdirectory$bucket/$pwadName.zip"
-            checkPwadExistence(portsIdgamesPath).map { exists =>
-              if (exists) Some(ApiPwad(pwadName, portsIdgamesPath))
-              else None
+            checkPwadExistence(portsIdgamesPath).flatMap { exists =>
+              if (exists) {
+                Future.successful(Some(ApiPwad(pwadName, portsIdgamesPath)))
+              } else {
+                // Test megawads... this is a damn mess
+                val megawadsIdgamesPath = s"$doom2MegawadPrefix/$pwadName.zip"
+                checkPwadExistence(megawadsIdgamesPath).flatMap { exists =>
+                  if (exists) {
+                    Future.successful(Some(ApiPwad(pwadName, megawadsIdgamesPath)))
+                  } else {
+                    // Test ports megawads. WE HAVE TO GO DEEPER (this is TERRIBLE code)
+                    val megawadsPortsIdgamesPath = s"$doom2PortMegawadPrefix/$pwadName.zip"
+                    checkPwadExistence(megawadsPortsIdgamesPath).map { exists =>
+                      if (exists) {
+                        Some(ApiPwad(pwadName, megawadsPortsIdgamesPath))
+                      } else {
+                        None
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
