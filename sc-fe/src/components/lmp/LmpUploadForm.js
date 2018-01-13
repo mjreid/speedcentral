@@ -100,7 +100,7 @@ export default class LmpUploadForm extends Component {
                              groupClass={this.controlBackground()} labelSize={2} inputSize={10}
           />
         <LmpRuntimeSelector category={lmpData.category} onLmpDataChanged={onLmpDataChanged}
-                            groupClass={this.controlBackground()} labelSize={2} inputSize={10}
+                            groupClass={this.controlBackground()} labelSize={2} inputSize={10} runTime={lmpData.runTime}
           />
         <LmpPrimaryPwadSelector pwadResolveRequest={pwadResolveRequest} onLmpDataChanged={onLmpDataChanged} iwad={lmpData.iwad} pwad={lmpData.primaryPwad}
                                 groupClass={this.controlBackground()} labelSize={2} filenameSize={3} urlSize={7}

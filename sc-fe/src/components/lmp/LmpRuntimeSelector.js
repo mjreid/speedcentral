@@ -6,7 +6,7 @@ import "./Lmp.css"
 export default class LmpRuntimeSelector extends Component {
 
   static propTypes = {
-    runTimeIso: PropTypes.string.required,
+    runTime: PropTypes.string.required,
     onLmpDataChanged: PropTypes.func.required,
     groupClass: PropTypes.string.required,
     labelSize: PropTypes.number.required,
@@ -16,10 +16,27 @@ export default class LmpRuntimeSelector extends Component {
   constructor(props) {
     super(props);
     this.onBlur = this.onBlur.bind(this);
+    this.onChange = this.onChange.bind(this);
+  }
+
+  onChange(event) {
+    const runTime = event.target.value;
+    this.props.onLmpDataChanged({ runTime: runTime });
   }
 
   onBlur(event) {
-    const runTime = event.target.value;
+    let runTime = event.target.value;
+    // Try to convert non-HH:MM:SS formats to HH:MM:SS (e.g. 4:56 -> 00:04:56)
+    if (runTime) {
+      runTime = runTime.replace(/\D/g, '');
+      const zeroesToPad = 6 - runTime.length;
+      let zeroes = "";
+      if (zeroesToPad > 0) {
+        zeroes = '0'.repeat(zeroesToPad);
+      }
+      runTime = zeroes + runTime;
+      runTime = runTime[0] + runTime[1] + ":" + runTime[2] + runTime[3] + ":" + runTime[4] + runTime[5];
+    }
     this.props.onLmpDataChanged({ runTime: runTime });
   }
 
@@ -32,7 +49,7 @@ export default class LmpRuntimeSelector extends Component {
             Run Time
           </Col>
           <Col sm={this.props.inputSize}>
-            <FormControl type="text" value={this.props.runTime} onBlur={this.onBlur} placeholder="HH:MM:SS"/>
+            <FormControl type="text" value={this.props.runTime} onBlur={this.onBlur} onChange={this.onChange} placeholder="HH:MM:SS"/>
           </Col>
         </FormGroup>
       </div>
