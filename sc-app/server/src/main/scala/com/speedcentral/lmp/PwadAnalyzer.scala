@@ -6,6 +6,7 @@ import akka.http.scaladsl.model._
 import akka.stream.ActorMaterializer
 import com.speedcentral.ScAppException
 import com.speedcentral.api.ApiPwad
+import org.slf4j.LoggerFactory
 
 import scala.concurrent.Future
 
@@ -14,6 +15,7 @@ class PwadAnalyzer(
 ) {
   private implicit val system: ActorSystem = ActorSystem("idgames-viewer")
   private implicit val materializer: ActorMaterializer = ActorMaterializer()
+  private val logger = LoggerFactory.getLogger(classOf[PwadAnalyzer])
   import system.dispatcher
 
   private val doomLevelsBase = "/levels/doom"
@@ -85,10 +87,13 @@ class PwadAnalyzer(
       Future.successful(Some(ApiPwad(pwadName, pwadName)))
     } else {
       if (specialWads.contains(pwadName)) {
+        logger.info(s"Found $pwadName in special wads")
         Future.successful(Some(ApiPwad(pwadName, specialWads(pwadName))))
       } else if (doom2Megawads.contains(pwadName)) {
+        logger.info(s"Found $pwadName in doom2 megawads")
         Future.successful(Some(ApiPwad(pwadName, s"$doom2MegawadPrefix/${doom2Megawads(pwadName)}")))
       } else if (doom2PortMegawads.contains(pwadName)) {
+        logger.info(s"Found $pwadName in doom2 port megawads")
         Future.successful(Some(ApiPwad(pwadName, s"$doom2PortMegawadPrefix/${doom2PortMegawads(pwadName)}")))
       } else {
 
@@ -102,28 +107,37 @@ class PwadAnalyzer(
 
         // test main first
         val idgamesPath = s"$basePath$bucket/$pwadName.zip"
+        logger.info(s"Attempting to resolve $idgamesPath...")
         checkPwadExistence(idgamesPath).flatMap { exists =>
           if (exists) {
+            logger.info(s"$idgamesPath existed!")
             Future.successful(Some(ApiPwad(pwadName, idgamesPath)))
           } else {
             // test Ports folder
             val portsIdgamesPath = s"$basePath$portsSubdirectory$bucket/$pwadName.zip"
+            logger.info(s"$idgamesPath failed, attempting to resolve $portsIdgamesPath...")
             checkPwadExistence(portsIdgamesPath).flatMap { exists =>
               if (exists) {
+                logger.info(s"$portsIdgamesPath existed!")
                 Future.successful(Some(ApiPwad(pwadName, portsIdgamesPath)))
               } else {
                 // Test megawads... this is a damn mess
                 val megawadsIdgamesPath = s"$doom2MegawadPrefix/$pwadName.zip"
+                logger.info(s"$portsIdgamesPath failed, attempting to resolve $megawadsIdgamesPath...")
                 checkPwadExistence(megawadsIdgamesPath).flatMap { exists =>
                   if (exists) {
+                    logger.info(s"$megawadsIdgamesPath existed!")
                     Future.successful(Some(ApiPwad(pwadName, megawadsIdgamesPath)))
                   } else {
                     // Test ports megawads. WE HAVE TO GO DEEPER (this is TERRIBLE code)
                     val megawadsPortsIdgamesPath = s"$doom2PortMegawadPrefix/$pwadName.zip"
+                    logger.info(s"$portsIdgamesPath failed, attempting to resolve $megawadsPortsIdgamesPath...")
                     checkPwadExistence(megawadsPortsIdgamesPath).map { exists =>
                       if (exists) {
+                        logger.info(s"$megawadsPortsIdgamesPath existed!")
                         Some(ApiPwad(pwadName, megawadsPortsIdgamesPath))
                       } else {
+                        logger.warn(s"Did not find requested PWAD $pwadName in any resolution path.")
                         None
                       }
                     }

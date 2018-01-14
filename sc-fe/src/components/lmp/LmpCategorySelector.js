@@ -35,6 +35,7 @@ export default class LmpCategorySelector extends Component {
             <option value="uv-speed">UV Speed</option>
             <option value="nm-speed">NM Speed</option>
             <option value="nm100">NM100</option>
+            <option value="uv-fast">UV -fast</option>
           </FormControl>
         </Col>
       </FormGroup>

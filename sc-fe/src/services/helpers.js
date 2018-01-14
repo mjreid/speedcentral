@@ -38,6 +38,7 @@ export function categoryProperName(category) {
   else if (category === "nm100") return "NM 100";
   else if (category === "uv-speed") return "UV Speed";
   else if (category === "nm-speed") return "NM Speed";
+  else if (category === "uv-fast") return "UV -fast";
   else return "";
 }
 

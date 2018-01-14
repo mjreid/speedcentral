@@ -89,9 +89,20 @@ class Recorder(
       buildOutputVideoPath(recordingId).toString
     )
 
-    val pwads = pwadsToInclude.flatMap (pwad => Seq("-file", pwad.toString))
+    val pwads = pwadsToInclude.flatMap (p => makePwadCommand(p))
 
     baseCommand ++ pwads
+  }
+
+  // Hardcoded exceptions for nonstandard, popular WADs.
+  private def makePwadCommand(pwadPath: Path): Seq[String] = {
+    if (pwadPath.endsWith("btsx_e1.wad")) {
+      Seq("-file", pwadPath.getParent.resolve("btsx_e1a.wad").toString,
+                   pwadPath.getParent.resolve("btsx_e1b.wad").toString,
+          "-deh", pwadPath.getParent.resolve("btsx_e1.deh").toString)
+    } else {
+      Seq("-file", pwadPath.toString)
+    }
   }
 
   private def buildOutputVideoPath(recordingId: String): Path = {

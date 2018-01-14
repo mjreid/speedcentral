@@ -40,6 +40,8 @@ object VideoTitleUtil {
       case "nm100" => "NM 100"
       case "uv-speed" => "UV Speed"
       case "nm-speed" => "NM Speed"
+      case "uv-fast" => "UV -fast"
+      case _ => ""
     }
   }
 

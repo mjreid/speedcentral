@@ -56,7 +56,7 @@ class YouTubeWrapperImpl(
 
     val metadata = new Video()
     val videoStatus = new VideoStatus()
-    videoStatus.setPrivacyStatus("unlisted")
+    videoStatus.setPrivacyStatus("public")
     metadata.setStatus(videoStatus)
 
     val snippet = new VideoSnippet()
